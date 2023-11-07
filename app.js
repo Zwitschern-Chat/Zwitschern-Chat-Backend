@@ -13,8 +13,23 @@ const dbConfig = {
   database: 'zwitschern.chat'
 };
 
+app.get('/posts', async (req, res) => {
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+    
+    const [rows, fields] = await connection.execute('SELECT * FROM posts;');
+    
+    await connection.end();
+    
+    res.json(rows);
+  } catch (error) {
+    console.error('Fehler beim Zugriff auf die Datenbank: ', error.message);
+    res.status(500).send('Datenbankfehler');
+  }
+});
 
-app.get('/daten', async (req, res) => {
+
+app.get('/users', async (req, res) => {
   try {
     const connection = await mysql.createConnection(dbConfig);
     
