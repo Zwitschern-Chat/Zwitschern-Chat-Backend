@@ -4,7 +4,18 @@ const app = express();
 
 const port = 3000;
 
-const dbConfig = {
+// Funktion zum Überprüfen von Command-Line-Argumenten
+function checkForDevArg() {
+  return process.argv.includes('-dev'); // Nutze den Befehl "node app.js -dev" um die lokale Datenbank zu verwenden
+}
+
+// Entscheiden Sie, welche Datenbankkonfiguration basierend auf dem Argument verwendet werden soll
+const dbConfig = checkForDevArg() ? {
+  host: 'localhost',
+  user: 'root',
+  port: '3306',
+  database: 'zwitschern.chat'
+} : {
   host: '45.81.234.35',
   user: 'root',
   port: '3306',
