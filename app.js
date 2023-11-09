@@ -1,9 +1,8 @@
 const express = require('express');
 const mysql = require('mysql2/promise');
-
 const app = express();
-const port = 3000;
 
+const port = 3000;
 
 const dbConfig = {
   host: '45.81.234.35',
@@ -13,7 +12,8 @@ const dbConfig = {
   database: 'zwitschern.chat'
 };
 
-app.get('/posts', async (req, res) => {
+
+app.get('/api/posts', async (req, res) => {
   try {
     const connection = await mysql.createConnection(dbConfig);
     
@@ -29,7 +29,7 @@ app.get('/posts', async (req, res) => {
 });
 
 
-app.get('/users', async (req, res) => {
+app.get('/api/users', async (req, res) => {
   try {
     const connection = await mysql.createConnection(dbConfig);
     
