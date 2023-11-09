@@ -1,0 +1,27 @@
+# Abhängigkeiten
+/node_modules
+
+# Log-Dateien
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime Daten
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Verzeichnis für generierte Dateien
+/dist
+
+# dotenv Umgebungsvariablen Dateien
+.env
+.env.test
+
+# OSX sinnlose Dateien
+.DS_Store
+
+# Optional: ignorieren Sie die lock-Dateien
+# package-lock.json
+# yarn.lock
