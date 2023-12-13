@@ -18,6 +18,8 @@ function checkForDevArg() {
 }
 
 // Entscheiden Sie, welche Datenbankkonfiguration basierend auf dem Argument verwendet werden soll
+// Wenn das '-dev' Argument vorhanden ist, wird 'localhost' als Host verwendet
+// Andernfalls wird die Produktionsdatenbankkonfiguration verwendet
 const dbConfig = checkForDevArg() ? {
   host: 'localhost',
   user: 'root',
@@ -73,5 +75,10 @@ app.get('/ping', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Listen at ${port}`);
+  // Gibt eine Meldung aus, welche Konfiguration verwendet wird
+  if (checkForDevArg()) {
+    console.log(`Entwicklungsmodus aktiviert: Backend hört auf Port ${port} (lokal)`);
+  } else {
+    console.log(`Produktionsmodus aktiviert: Backend hört auf Port ${port} (live)`);
+  }
 });
