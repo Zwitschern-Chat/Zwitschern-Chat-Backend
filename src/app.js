@@ -49,6 +49,22 @@ app.get('/api/posts', async (req, res) => {
   }
 });
 
+// Endpoint zum Erstellen eines neuen Posts (placeholder)
+app.post('/api/posts', async (req, res) => {
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+    
+    const [rows, fields] = await connection.execute('INSERT INTO posts (text, userId) VALUES (?, ?);', [req.body.text, req.body.userId]);
+    
+    await connection.end();
+    
+    res.json(rows);
+  } catch (error) {
+    console.error('Fehler beim Zugriff auf die Datenbank: ', error.message);
+    res.status(500).send('Datenbankfehler');
+  }
+});
+
 
 app.get('/api/users', async (req, res) => {
   try {
@@ -75,36 +91,11 @@ app.get('/ping', (req, res) => {
 });
 
 
-const { auth } = require('express-openid-connect');
-
-const config = {
-  authRequired: false,
-  auth0Logout: true,
-  secret: 'sX_moUorNFXs3Ot17KAetIy9AiXFfqHeDXoIgOotbDYXSsh-0_W7Bd8099Mz9zPz',
-  baseURL: 'https://zwitschern.chat/',
-  clientID: '6dHWgZ691XG9pTlUar21zBrdVEvctyFP',
-  issuerBaseURL: 'https://dev-x6a4ln1r3kk4uz5p.us.auth0.com'
-};
-
-// auth router attaches /login, /logout, and /callback routes to the baseURL
-app.use(auth(config));
-
-// req.isAuthenticated is provided from the auth router
-app.get('/api/check', (req, res) => {
-  res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
-});
-
-const { requiresAuth } = require('express-openid-connect');
-
-app.get('/api/profile', requiresAuth(), (req, res) => {
-  res.send(JSON.stringify(req.oidc.user));
-});
-
 app.listen(port, () => {
   // Gibt eine Meldung aus, welche Konfiguration verwendet wird
   if (checkForDevArg()) {
-    console.log(`Entwicklungsmodus aktiviert: Backend hört auf Port ${port} (lokal)`);
+    console.log(`Entwicklungsmodus aktiviert: API hört auf Port ${port} (lokal)`);
   } else {
-    console.log(`Produktionsmodus aktiviert: Backend hört auf Port ${port} (live)`);
+    console.log(`Produktionsmodus aktiviert: API hört auf Port ${port} (live)`);
   }
 });
