@@ -17,11 +17,11 @@ const config = {
   app.use(auth(config));
   
   // req.isAuthenticated is provided from the auth router
-  app.get('/api/check', (req, res) => {
+  app.get('/auth/check', (req, res) => {
     res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
   });
   
-  app.get('/api/profile', requiresAuth(), (req, res) => {
+  app.get('/auth/profile', requiresAuth(), (req, res) => {
     res.send(JSON.stringify(req.oidc.user));
   });
 
