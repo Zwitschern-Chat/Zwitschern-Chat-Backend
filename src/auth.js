@@ -25,6 +25,36 @@ const config = {
     res.send(JSON.stringify(req.oidc.user));
   });
 
+  app.get('/auth/callback', async (req, res) => {
+    // Extrahieren der Nutzerdaten aus dem Request-Objekt nach der Authentifizierung
+    if (req.oidc && req.oidc.user) {
+      const userData = {
+        email: req.oidc.user.email, // E-Mail-Adresse des Nutzers
+        userId: req.oidc.user.sub // Nutzer-ID, normalerweise im 'sub'-Feld des Tokens
+      };
+  
+      // Senden der Nutzerdaten an den API-Endpoint
+      try {
+        const response = await fetch('https://zwitschern.chat/api/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(userData)
+        });
+  
+        const data = await response.json();
+        console.log(data);
+      } catch (error) {
+        console.error('Fehler beim Senden der Nutzerdaten: ', error);
+      }
+    } else {
+      console.error('Nutzerdaten nicht verfügbar');
+    }
+  
+    // Weiterleiten des Nutzers zu einer anderen Seite
+    res.redirect('/auth/check');
+  });
+  
+  
   app.listen(port, () => {
     console.log(`Aktiviert: AUTH hört auf Port ${port}`);
   });
