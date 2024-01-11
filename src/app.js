@@ -65,6 +65,21 @@ app.post('/api/posts', async (req, res) => {
   }
 });
 
+app.post('/api/users', async (req, res) => {
+  try {
+    const { email, userId } = req.body;
+    const connection = await mysql.createConnection(dbConfig);
+
+    const [rows, fields] = await connection.execute('INSERT INTO users (email, userId) VALUES (?, ?);', [email, userId]);
+
+    await connection.end();
+
+    res.json({ success: true, message: 'Nutzer erfolgreich hinzugefügt.' });
+  } catch (error) {
+    console.error('Fehler beim Speichern des Nutzers: ', error.message);
+    res.status(500).send('Datenbankfehler');
+  }
+});
 
 app.get('/api/users', async (req, res) => {
   try {
