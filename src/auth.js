@@ -25,7 +25,7 @@ const config = {
     res.send(JSON.stringify(req.oidc.user));
   });
 
-  app.get('/auth/callback', async (req, res) => {
+  app.post('/auth/callback', async (req, res) => {
     // Extrahieren der Nutzerdaten aus dem Request-Objekt nach der Authentifizierung
     if (req.oidc && req.oidc.user) {
       const userData = {
