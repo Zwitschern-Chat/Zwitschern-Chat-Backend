@@ -7,7 +7,7 @@ const config = {
     authRequired: false,
     auth0Logout: true,
     secret: process.env.SECRET,   //secrect import from .env file
-    baseURL: 'https://zwitschern.chat/',
+    baseURL: 'https://zwitschern.chat/auth/',
     clientID: '6dHWgZ691XG9pTlUar21zBrdVEvctyFP',
     issuerBaseURL: 'https://dev-x6a4ln1r3kk4uz5p.us.auth0.com'
   };
@@ -25,7 +25,7 @@ const config = {
     res.send(JSON.stringify(req.oidc.user));
   });
 
-  app.get('/callback', async (req, res) => {
+  app.get('/auth/callback', async (req, res) => {
     // Extrahieren der Nutzerdaten aus dem Request-Objekt nach der Authentifizierung
     if (req.oidc && req.oidc.user) {
       const userData = {
