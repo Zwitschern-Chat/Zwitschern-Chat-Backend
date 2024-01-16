@@ -17,15 +17,15 @@ const config = {
   app.use(auth(config));
   
   // req.isAuthenticated is provided from the auth router
-  app.get('/auth/check', (req, res) => {
+  app.get('/check', (req, res) => {
     res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
   });
   
-  app.get('/auth/profile', requiresAuth(), (req, res) => {
+  app.get('/profile', requiresAuth(), (req, res) => {
     res.send(JSON.stringify(req.oidc.user));
   });
 
-  app.post('/auth/callback', async (req, res) => {
+  app.post('/callback', async (req, res) => {
     // Extrahieren der Nutzerdaten aus dem Request-Objekt nach der Authentifizierung
     if (req.oidc && req.oidc.user) {
       const userData = {
@@ -47,11 +47,13 @@ const config = {
         console.error('Fehler beim Senden der Nutzerdaten: ', error);
       }
     } else {
-      console.error('Nutzerdaten nicht verfügbar');
-    }
-  
-    // Weiterleiten des Nutzers zu einer anderen Seite
-    res.redirect('/auth/check');
+        console.error('Nutzerdaten nicht verfügbar');
+        // Erweiterte Fehlerbehandlung zur Diagnose:
+        console.error('req.oidc:', req.oidc);
+        console.error('req.oidc.user:', req.oidc.user);
+        // Senden Sie eine Fehlerantwort an den Client
+        res.status(500).send('Ein interner Fehler ist aufgetreten');
+      }
   });
   
   
