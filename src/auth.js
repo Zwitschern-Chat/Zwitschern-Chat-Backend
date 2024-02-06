@@ -42,22 +42,27 @@ app.use(async (req, res, next) => {
   if (req.oidc.isAuthenticated()) {
     const userData = {
       email: req.oidc.user.email,
-      username: req.oidc.user.nickname
+      username: req.oidc.user.nickname,
+      profile_picture: req.oidc.user.picture // oder den entsprechenden Pfad anpassen, falls anders
     };
 
     try {
       const connection = await mysql.createConnection(dbConfig);
-      // Überprüfen, ob ein Nutzer mit der gleichen E-Mail und/oder dem gleichen Benutzernamen existiert
-      const checkUserSql = `SELECT id FROM user WHERE email = ? OR username = ? LIMIT 1;`;
-      const [user] = await connection.execute(checkUserSql, [userData.email, userData.username]);
+      // Überprüfen, ob ein Nutzer mit der gleichen E-Mail existiert
+      const checkUserSql = `SELECT id, profile_picture FROM user WHERE email = ? LIMIT 1;`;
+      const [users] = await connection.execute(checkUserSql, [userData.email]);
 
-      if (user[0]) {
-        // Benutzer existiert bereits, aktualisieren Sie den Benutzernamen oder führen Sie eine andere gewünschte Aktion aus
-        console.log('Benutzer existiert bereits, kein neuer Eintrag erforderlich.');
+      if (users.length > 0) {
+        const user = users[0];
+        // Benutzer existiert bereits, aktualisieren Sie ggf. den Benutzernamen und das Profilbild
+        const updateSql = `UPDATE user SET username = ?, profile_picture = ? WHERE id = ?;`;
+        await connection.execute(updateSql, [userData.username, userData.profile_picture, user.id]);
+        console.log('Benutzerdaten aktualisiert.');
       } else {
         // Benutzer existiert nicht, fügen Sie den neuen Benutzer ein
-        const insertSql = `INSERT INTO user (email, username) VALUES (?, ?);`;
-        await connection.execute(insertSql, [userData.email, userData.username]);
+        const insertSql = `INSERT INTO user (email, username, profile_picture) VALUES (?, ?, ?);`;
+        await connection.execute(insertSql, [userData.email, userData.username, userData.profile_picture]);
+        console.log('Neuer Benutzer hinzugefügt.');
       }
 
       await connection.end();
@@ -67,6 +72,8 @@ app.use(async (req, res, next) => {
   }
   next();
 });
+
+
 
 // Route um Nutzerinformationen abzufragen
 app.get('/auth/user', requiresAuth(), (req, res) => {
