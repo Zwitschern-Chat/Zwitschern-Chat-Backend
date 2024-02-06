@@ -59,10 +59,10 @@ app.use(async (req, res, next) => {
         await connection.execute(updateSql, [userData.username, userData.profile_picture, user.id]);
         console.log('Benutzerdaten aktualisiert.');
       } else {
-        // Benutzer existiert nicht, fügen Sie den neuen Benutzer ein
-        const insertSql = `INSERT INTO user (email, username, profile_picture) VALUES (?, ?, ?);`;
+        // Benutzer existiert nicht, fügen Sie den neuen Benutzer ein und weisen Sie ihm die Rolle 'user_role' zu
+        const insertSql = `INSERT INTO user (email, username, profile_picture, role) VALUES (?, ?, ?, 'user_role');`;
         await connection.execute(insertSql, [userData.email, userData.username, userData.profile_picture]);
-        console.log('Neuer Benutzer hinzugefügt.');
+        console.log('Neuer Benutzer hinzugefügt und Rolle zugewiesen.');
       }
 
       await connection.end();
