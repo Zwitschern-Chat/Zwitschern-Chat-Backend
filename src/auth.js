@@ -37,6 +37,38 @@ function checkForDevArg() {
   return process.argv.includes('-dev'); // Nutze den Befehl "node app.js -dev" um die lokale Datenbank zu verwenden
 }
 
+// Middleware to check and update user data in database after each authentication
+app.use(async (req, res, next) => {
+  if (req.oidc.isAuthenticated()) {
+    const userData = {
+      email: req.oidc.user.email,
+      username: req.oidc.user.nickname
+    };
+
+    try {
+      const connection = await mysql.createConnection(dbConfig);
+      // Überprüfen, ob ein Nutzer mit der gleichen E-Mail und/oder dem gleichen Benutzernamen existiert
+      const checkUserSql = `SELECT id FROM user WHERE email = ? OR username = ? LIMIT 1;`;
+      const [user] = await connection.execute(checkUserSql, [userData.email, userData.username]);
+
+      if (user[0]) {
+        // Benutzer existiert bereits, aktualisieren Sie den Benutzernamen oder führen Sie eine andere gewünschte Aktion aus
+        console.log('Benutzer existiert bereits, kein neuer Eintrag erforderlich.');
+      } else {
+        // Benutzer existiert nicht, fügen Sie den neuen Benutzer ein
+        const insertSql = `INSERT INTO user (email, username) VALUES (?, ?);`;
+        await connection.execute(insertSql, [userData.email, userData.username]);
+      }
+
+      await connection.end();
+    } catch (error) {
+      console.error('Fehler beim Aktualisieren der Benutzerdaten in der Datenbank: ', error.message);
+    }
+  }
+  next();
+});
+
+
 // login and redirect to account
 app.get('/auth/login', requiresAuth(), (req, res) => {
     res.redirect('/account');
@@ -52,35 +84,6 @@ app.get('/auth/logout', (req, res) => {
 // check if user is logged in or not
 app.get('/auth/check', (req, res) => {
   res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
-});
-
-
-// profile and send user data to extra database 
-app.get('/auth/profile', requiresAuth(), async (req, res) => {
-  const userData = {
-    email: req.oidc.user.email,
-    username: req.oidc.user.nickname
-  };
-
-  try {
-    const connection = await mysql.createConnection(dbConfig);
-
-    // Der SQL-Befehl prüft, ob ein Benutzer mit der gleichen E-Mail existiert und aktualisiert dessen Benutzernamen.
-    // Falls der Benutzer nicht existiert, wird ein neuer Eintrag erstellt.
-    const sql = `
-      INSERT INTO user (email, username) 
-      VALUES (?, ?) 
-      ON DUPLICATE KEY UPDATE username = VALUES(username);
-    `;
-    await connection.execute(sql, [userData.email, userData.username]);
-
-    await connection.end();
-
-    res.send(JSON.stringify(userData));
-  } catch (error) {
-    console.error('Fehler beim Speichern des Nutzers: ', error.message);
-    res.status(500).send('Fehler beim Zugriff auf die Datenbank: ' + error.message);
-  }
 });
 
 // callback get
