@@ -10,22 +10,28 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+// Zum Parsen von application/json
+app.use(express.json()); 
+// Zum Parsen von application/x-www-form-urlencoded
+app.use(express.urlencoded({ extended: true }));
+
+
 const port = 3000;
 
 
-// Middleware zur Überprüfung des API-Schlüssels
 function verifyApiKey(req, res, next) {
   const apiKey = req.query.apiKey;
+  // Extrahieren des API-Schlüssels aus den Headers
 
-  // Setzen Sie hier Ihren gewünschten statischen API-Schlüssel
   const expectedApiKey = 'Fen4GC6KRjmt';
 
   if (apiKey && apiKey === expectedApiKey) {
-    next(); // API-Schlüssel ist korrekt, fortfahren zur nächsten Middleware/Routen-Handler
+    next();
   } else {
     res.status(401).send('Ungültiger API-Schlüssel');
   }
 }
+
 
 // Anwendung der Middleware auf alle /api/ Routen
 app.use('/api', verifyApiKey);
@@ -51,7 +57,25 @@ const dbConfig = checkForDevArg() ? {
   database: 'zwitschern'
 };
 
+// user username or email to get user id
+app.get('/api/user', async (req, res) => {
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+    const { username, email } = req.query;
+    let [rows, fields] = await connection.execute('SELECT id FROM user WHERE username = ? OR email = ?;', [username, email]);
+    await connection.end();
+    if (rows.length > 0) {
+      res.json({ id: rows[0].id });
+    } else {
+      res.status(404).send('Nutzer nicht gefunden.');
+    }
+  } catch (error) {
+    console.error('Fehler beim Zugriff auf die Datenbank: ', error.message);
+    res.status(500).send('Fehler beim Zugriff auf die Datenbank: ' + error.message);
+  }
+});
 
+// Endpoint zum Abrufen aller Posts
 app.get('/api/posts', async (req, res) => {
   try {
     const connection = await mysql.createConnection(dbConfig);
@@ -67,21 +91,25 @@ app.get('/api/posts', async (req, res) => {
   }
 });
 
-// Endpoint zum Erstellen eines neuen Posts (placeholder)
-app.post('/api/posts', async (req, res) => {
+app.post('/api/post', async (req, res) => {
+  const { title, body, userId } = req.body;
+
+  // Überprüfen Sie, ob alle Werte vorhanden sind
+  if (title === undefined || body === undefined || userId === undefined) {
+    return res.status(400).send('Fehlende Daten: title, body und userId sind erforderlich.');
+  }
+
   try {
     const connection = await mysql.createConnection(dbConfig);
-    
-    const [rows, fields] = await connection.execute('INSERT INTO post (text, userId) VALUES (?, ?);', [req.body.text, req.body.userId]);
-    
+    const [rows, fields] = await connection.execute('INSERT INTO post (title, body, user_id) VALUES (?, ?, ?);', [title, body, userId]);
     await connection.end();
-    
-    res.json(rows);
+    res.json({ success: true, message: 'Post erfolgreich erstellt.', postId: rows.insertId });
   } catch (error) {
     console.error('Fehler beim Zugriff auf die Datenbank: ', error.message);
     res.status(500).send('Fehler beim Zugriff auf die Datenbank: ' + error.message);
   }
 });
+
 
 app.post('/api/users', async (req, res) => {
   try {
