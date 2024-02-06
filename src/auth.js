@@ -78,15 +78,18 @@ app.use(async (req, res, next) => {
 // Route um Nutzerinformationen abzufragen
 app.get('/auth/user', requiresAuth(), (req, res) => {
   if (req.oidc.user) {
-    // Senden Sie die Nutzerdaten an das Frontend, wenn der Nutzer eingeloggt ist
+    // Senden Sie die Nutzerdaten an das Frontend, einschließlich des Profilbilds
     res.json({
       username: req.oidc.user.nickname, // oder 'name', 'email', je nachdem welche Information Sie anzeigen möchten
+      profilePictureUrl: req.oidc.user.picture, // URL des Profilbilds
+      email: req.oidc.user.email, // E-Mail-Adresse
     });
   } else {
     // Wenn der Nutzer nicht eingeloggt ist, senden Sie eine entsprechende Antwort
     res.status(401).json({ error: 'Nutzer nicht authentifiziert' });
   }
 });
+
 
 
 // login and redirect to account
