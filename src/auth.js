@@ -44,7 +44,7 @@ app.use(async (req, res, next) => {
     const userData = {
       email: req.oidc.user.email,
       username: req.oidc.user.nickname,
-      profile_picture: req.oidc.user.picture // oder den entsprechenden Pfad anpassen, falls anders
+      profile_picture: req.oidc.user.picture 
     };
 
     try {
@@ -91,7 +91,10 @@ app.get('/auth/user', requiresAuth(), (req, res) => {
   }
 });
 
-
+// debug, user if like id, token, etc
+app.get('/auth/debug', requiresAuth(), (req, res) => {
+  res.json(req.oidc.user);
+});
 
 // login
 app.get('/auth/login', requiresAuth(), (req, res) => {
