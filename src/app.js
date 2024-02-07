@@ -143,15 +143,6 @@ app.get('/api/users', async (req, res) => {
 });
 
 
-app.get('/', (req, res) => {
-  res.status(200).send('http://zwitschern.chat:3000/ping');
-});
-
-app.get('/ping', (req, res) => {
-  res.status(200).send('Pong!');
-});
-
-
 app.listen(port, () => {
   // Gibt eine Meldung aus, welche Konfiguration verwendet wird
   if (checkForDevArg()) {

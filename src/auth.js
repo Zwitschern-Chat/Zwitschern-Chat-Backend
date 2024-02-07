@@ -39,7 +39,7 @@ function checkForDevArg() {
 
 // Middleware to check and update user data in database after each authentication
 app.use(async (req, res, next) => {
-  if (req.oidc.isAuthenticated()) {
+
     const userData = {
       email: req.oidc.user.email,
       username: req.oidc.user.nickname,
@@ -69,14 +69,14 @@ app.use(async (req, res, next) => {
     } catch (error) {
       console.error('Fehler beim Aktualisieren der Benutzerdaten in der Datenbank: ', error.message);
     }
-  }
+
   next();
 });
 
 
 
 // Route um Nutzerinformationen abzufragen
-app.get('/auth/user', requiresAuth(), (req, res) => {
+app.get('/auth/user', (req, res) => {
   if (req.oidc.user) {
     // Senden Sie die Nutzerdaten an das Frontend, einschließlich des Profilbilds
     res.json({
@@ -92,10 +92,15 @@ app.get('/auth/user', requiresAuth(), (req, res) => {
 
 
 
-// login and redirect to account
+// login
 app.get('/auth/login', requiresAuth(), (req, res) => {
     res.redirect('/account');
   });
+
+// account page 
+app.get('/auth/account', requiresAuth(), (req, res) => {
+  res.redirect('https://zwitschern.chat');
+});
   
 // logout and redirect to home
 app.get('/auth/logout', (req, res) => {
@@ -104,7 +109,7 @@ app.get('/auth/logout', (req, res) => {
   });
 });
 
-// check if user is logged in or not
+// debug, check if user is logged in or not
 app.get('/auth/check', (req, res) => {
   res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
 });
