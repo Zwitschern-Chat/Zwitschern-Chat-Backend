@@ -3,8 +3,8 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Erstellungszeit: 29. Jan 2024 um 16:04
--- Server-Version: 8.0.35-0ubuntu0.22.04.1
+-- Erstellungszeit: 07. Feb 2024 um 13:37
+-- Server-Version: 8.0.36-0ubuntu0.22.04.1
 -- PHP-Version: 8.1.2-1ubuntu2.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -20,25 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Datenbank: `zwitschern`
 --
-
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `follows`
---
-
-CREATE TABLE `follows` (
-  `following_user_id` int DEFAULT NULL,
-  `followed_user_id` int DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-
---
--- Daten für Tabelle `follows`
---
-
-INSERT INTO `follows` (`following_user_id`, `followed_user_id`, `created_at`) VALUES
-(1, 2, '2023-11-07 08:03:59');
 
 -- --------------------------------------------------------
 
@@ -59,7 +40,8 @@ CREATE TABLE `post` (
 --
 
 INSERT INTO `post` (`id`, `title`, `body`, `user_id`, `created_at`) VALUES
-(1, 'Titel des post ist toll', 'Dies ist der Inhalt des post.', 1, '2023-11-07 08:04:08');
+(1, 'Titel des post ist toll', 'Dies ist der Inhalt des post.', 21, '2023-11-07 08:04:08'),
+(5, 'Ich liebe meine Freundin: ', 'Selina <3', 21, '2024-02-06 23:23:40');
 
 -- --------------------------------------------------------
 
@@ -83,21 +65,12 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `username`, `profile_picture`, `role`, `created_at`, `email`, `language`, `bio`) VALUES
-(1, 'beispiel_nutzer', 'link_zum_bild.jpg', 'user_role', '2023-10-31 11:47:17', NULL, NULL, NULL),
-(2, 'zweiter_nutzer', 'link_zum_bild_2.jpg', 'user_role', '2023-10-31 12:00:00', NULL, NULL, NULL),
-(3, 'civixi8632', NULL, NULL, '2024-01-29 14:23:23', 'civixi8632@ziragold.com', NULL, NULL),
-(4, 'risemeg792', NULL, NULL, '2024-01-29 15:11:42', 'risemeg792@flexvio.com', NULL, NULL);
+(21, 'civixi8632', 'https://s.gravatar.com/avatar/ff759f18ad5f7a9c49424e8baeea500a?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fci.png', 'user_role', '2024-02-06 20:51:35', 'civixi8632@ziragold.com', NULL, NULL),
+(22, 'mogon95734', 'https://s.gravatar.com/avatar/52bf2d597dd0d5b1a0e5e092bb0afb18?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fmo.png', 'user_role', '2024-02-06 21:28:52', 'mogon95734@cubene.com', NULL, NULL);
 
 --
 -- Indizes der exportierten Tabellen
 --
-
---
--- Indizes für die Tabelle `follows`
---
-ALTER TABLE `follows`
-  ADD KEY `following_user_id` (`following_user_id`),
-  ADD KEY `followed_user_id` (`followed_user_id`);
 
 --
 -- Indizes für die Tabelle `post`
@@ -120,24 +93,17 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT für Tabelle `post`
 --
 ALTER TABLE `post`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT für Tabelle `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- Constraints der exportierten Tabellen
 --
-
---
--- Constraints der Tabelle `follows`
---
-ALTER TABLE `follows`
-  ADD CONSTRAINT `follows_ibfk_1` FOREIGN KEY (`following_user_id`) REFERENCES `user` (`id`),
-  ADD CONSTRAINT `follows_ibfk_2` FOREIGN KEY (`followed_user_id`) REFERENCES `user` (`id`);
 
 --
 -- Constraints der Tabelle `post`
