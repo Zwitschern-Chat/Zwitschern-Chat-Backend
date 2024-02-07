@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Erstellungszeit: 07. Feb 2024 um 13:37
+-- Erstellungszeit: 07. Feb 2024 um 15:13
 -- Server-Version: 8.0.36-0ubuntu0.22.04.1
 -- PHP-Version: 8.1.2-1ubuntu2.14
 
@@ -53,7 +53,6 @@ CREATE TABLE `user` (
   `id` int NOT NULL,
   `username` varchar(255) NOT NULL,
   `profile_picture` varchar(255) DEFAULT NULL,
-  `role` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `email` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `language` varchar(255) DEFAULT NULL,
@@ -64,9 +63,9 @@ CREATE TABLE `user` (
 -- Daten für Tabelle `user`
 --
 
-INSERT INTO `user` (`id`, `username`, `profile_picture`, `role`, `created_at`, `email`, `language`, `bio`) VALUES
-(21, 'civixi8632', 'https://s.gravatar.com/avatar/ff759f18ad5f7a9c49424e8baeea500a?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fci.png', 'user_role', '2024-02-06 20:51:35', 'civixi8632@ziragold.com', NULL, NULL),
-(22, 'mogon95734', 'https://s.gravatar.com/avatar/52bf2d597dd0d5b1a0e5e092bb0afb18?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fmo.png', 'user_role', '2024-02-06 21:28:52', 'mogon95734@cubene.com', NULL, NULL);
+INSERT INTO `user` (`id`, `username`, `profile_picture`, `created_at`, `email`, `language`, `bio`) VALUES
+(21, 'civixi8632', 'https://s.gravatar.com/avatar/ff759f18ad5f7a9c49424e8baeea500a?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fci.png', '2024-02-06 20:51:35', 'civixi8632@ziragold.com', NULL, NULL),
+(22, 'mogon95734', 'https://s.gravatar.com/avatar/52bf2d597dd0d5b1a0e5e092bb0afb18?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fmo.png', '2024-02-06 21:28:52', 'mogon95734@cubene.com', NULL, NULL);
 
 --
 -- Indizes der exportierten Tabellen
