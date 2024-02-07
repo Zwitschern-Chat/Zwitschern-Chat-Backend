@@ -19,23 +19,6 @@ app.use(express.urlencoded({ extended: true }));
 const port = 3000;
 
 
-function verifyApiKey(req, res, next) {
-  const apiKey = req.query.apiKey;
-  // Extrahieren des API-Schlüssels aus den Headers
-
-  const expectedApiKey = 'Fen4GC6KRjmt';
-
-  if (apiKey && apiKey === expectedApiKey) {
-    next();
-  } else {
-    res.status(401).send('Ungültiger API-Schlüssel');
-  }
-}
-
-
-// Anwendung der Middleware auf alle /api/ Routen
-app.use('/api', verifyApiKey);
-
 // Funktion zum Überprüfen von Command-Line-Argumenten
 function checkForDevArg() {
   return process.argv.includes('-dev'); // Nutze den Befehl "node app.js -dev" um die lokale Datenbank zu verwenden
