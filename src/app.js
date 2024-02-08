@@ -40,12 +40,12 @@ const dbConfig = checkForDevArg() ? {
   database: 'zwitschern'
 };
 
-// user username or email to get user id
+// user username to get user id
 app.get('/api/user', async (req, res) => {
   try {
     const connection = await mysql.createConnection(dbConfig);
-    const { username, email } = req.query;
-    let [rows, fields] = await connection.execute('SELECT id FROM user WHERE username = ? OR email = ?;', [username, email]);
+    const { username } = req.query;
+    let [rows, fields] = await connection.execute('SELECT id FROM user WHERE username = ?;', [username]);
     await connection.end();
     if (rows.length > 0) {
       res.json({ id: rows[0].id });
@@ -96,10 +96,10 @@ app.post('/api/post', async (req, res) => {
 
 app.post('/api/users', async (req, res) => {
   try {
-    const { email, userId } = req.body;
+    const { userId } = req.body;
     const connection = await mysql.createConnection(dbConfig);
 
-    const [rows, fields] = await connection.execute('INSERT INTO user (email, userId) VALUES (?, ?);', [email, userId]);
+    const [rows, fields] = await connection.execute('INSERT INTO user (userId) VALUES (?, ?);', [userId]);
 
     await connection.end();
 
