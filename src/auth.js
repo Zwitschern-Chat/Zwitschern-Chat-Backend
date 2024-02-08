@@ -44,25 +44,25 @@ app.use(async (req, res, next) => {
     const userData = {
       username: req.oidc.user.nickname,
       profile_picture: req.oidc.user.picture,
-      id: req.oidc.user.sub
+      sub: req.oidc.user.sub
     };
 
     try {
       const connection = await mysql.createConnection(dbConfig);
-      // Überprüfen, ob ein Nutzer mit der gleichen id bereits existiert
-      const checkUserSql = `SELECT id FROM user WHERE id = ? LIMIT 1;`;
-      const [users] = await connection.execute(checkUserSql, [userData.id]);
+      // Überprüfen, ob ein Nutzer mit der gleichen sub bereits existiert
+      const checkUserSql = `SELECT sub FROM user WHERE sub = ? LIMIT 1;`;
+      const [users] = await connection.execute(checkUserSql, [userData.sub]);
 
       if (users.length > 0) {
         const user = users[0];
         // Benutzer existiert bereits, aktualisieren Sie ggf. den Benutzernamen und das Profilbild
-        const updateSql = `UPDATE user SET username = ?, profile_picture = ? WHERE id = ?;`;
-        await connection.execute(updateSql, [userData.username, userData.profile_picture, userData.id]);
+        const updateSql = `UPDATE user SET username = ?, profile_picture = ? WHERE sub = ?;`;
+        await connection.execute(updateSql, [userData.username, userData.profile_picture, userData.sub]);
         console.log('Benutzerdaten aktualisiert.');
       } else {
         // Benutzer existiert nicht, fügen Sie den neuen Benutzer ein
-        const insertSql = `INSERT INTO user (id, username, profile_picture) VALUES (?, ?, ?);`;
-        await connection.execute(insertSql, [userData.id, userData.username, userData.profile_picture]);
+        const insertSql = `INSERT INTO user (sub, username, profile_picture) VALUES (?, ?, ?);`;
+        await connection.execute(insertSql, [userData.sub, userData.username, userData.profile_picture]);
         console.log('Neuer Benutzer hinzugefügt.');
       }
 

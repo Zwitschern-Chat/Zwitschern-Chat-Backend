@@ -69,7 +69,7 @@ app.post('/api/post', async (req, res) => {
 
   try {
     const connection = await mysql.createConnection(dbConfig);
-    const [rows, fields] = await connection.execute('INSERT INTO post (message, user_id) VALUES (?, ?);', [message, userId]);
+    const [rows, fields] = await connection.execute('INSERT INTO post (message, user_number) VALUES (?, ?);', [message, userId]);
     await connection.end();
     res.json({ success: true, message: 'Post erfolgreich erstellt.', postId: rows.insertId });
   } catch (error) {
@@ -78,22 +78,6 @@ app.post('/api/post', async (req, res) => {
   }
 });
 
-
-// Endpoint zum Abrufen aller Nutzer
-app.get('/api/users', async (req, res) => {
-  try {
-    const connection = await mysql.createConnection(dbConfig);
-    
-    const [rows, fields] = await connection.execute('SELECT * FROM user;');
-    
-    await connection.end();
-    
-    res.json(rows);
-  } catch (error) {
-    console.error('Fehler beim Zugriff auf die Datenbank: ', error.message);
-    res.status(500).send('Fehler beim Zugriff auf die Datenbank: ' + error.message);
-  }
-});
 
 // Endpoint zum Abrufen eines Nutzers
 app.get('/api/user/:id', async (req, res) => {
