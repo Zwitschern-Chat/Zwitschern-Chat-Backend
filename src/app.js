@@ -41,23 +41,6 @@ const dbConfig = checkForDevArg() ? {
 };
 
 
-
-// Endpoint zum Abrufen aller Posts
-app.get('/api/posts', async (req, res) => {
-  try {
-    const connection = await mysql.createConnection(dbConfig);
-    
-    const [rows, fields] = await connection.execute('SELECT * FROM post;');
-    
-    await connection.end();
-    
-    res.json(rows);
-  } catch (error) {
-    console.error('Fehler beim Zugriff auf die Datenbank: ', error.message);
-    res.status(500).send('Fehler beim Zugriff auf die Datenbank: ' + error.message);
-  }
-});
-
 // Endpoint zum Erstellen eines neuen Posts
 app.post('/api/post', async (req, res) => {
   const { message, user_number } = req.body;
@@ -78,8 +61,57 @@ app.post('/api/post', async (req, res) => {
   }
 });
 
+// Endpoint zum Abrufen aller Posts
+app.get('/api/posts', async (req, res) => {
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+    
+    const [rows, fields] = await connection.execute('SELECT * FROM post;');
+    
+    await connection.end();
+    
+    res.json(rows);
+  } catch (error) {
+    console.error('Fehler beim Zugriff auf die Datenbank: ', error.message);
+    res.status(500).send('Fehler beim Zugriff auf die Datenbank: ' + error.message);
+  }
+});
 
-// Endpoint zum Abrufen eines Nutzers
+// Endpoint zum Abrufen aller Nutzer (ohne sub)
+app.get('/api/users', async (req, res) => {
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+    const [rows, fields] = await connection.execute('SELECT user_number, username, profile_picture FROM user;');
+    await connection.end();
+    res.json(rows);
+  } catch (error) {
+    console.error('Fehler beim Zugriff auf die Datenbank: ', error.message);
+    res.status(500).send('Fehler beim Zugriff auf die Datenbank: ' + error.message);
+  }
+});
+
+// Endpoint zum Abrufen von Nutzer Informationen anhand der number
+app.get('/api/user/:number', async (req, res) => {
+  const { user_number } = req.params;
+
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+    const [rows, fields] = await connection.execute('SELECT username, profile_picture FROM user WHERE number = ?;', [number]);
+    await connection.end();
+
+    if (rows.length === 0) {
+      res.status(404).send('Nutzer nicht gefunden.');
+    } else {
+      res.json(rows[0]);
+    }
+  } catch (error) {
+    console.error('Fehler beim Zugriff auf die Datenbank: ', error.message);
+    res.status(500).send('Fehler beim Zugriff auf die Datenbank: ' + error.message);
+  }
+});
+
+
+// Endpoint zum Abrufen der eigenen Nutzer Infos anhand von sub (Auth0-Identifikator)
 app.get('/api/user/:sub', async (req, res) => {
   const { sub } = req.params;
 
@@ -98,6 +130,9 @@ app.get('/api/user/:sub', async (req, res) => {
     res.status(500).send('Fehler beim Zugriff auf die Datenbank: ' + error.message);
   }
 });
+
+
+// Endpoint zum Abrufen aller Posts eines Nutzers
 
 
 app.listen(port, () => {
