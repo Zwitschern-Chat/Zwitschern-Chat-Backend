@@ -76,7 +76,7 @@ app.use(async (req, res, next) => {
 
 
 
-// endpoint to get user data from auth0 
+// endpoint to get all user data from auth0 
 app.get('/auth/user', requiresAuth(), (req, res) => {
   res.json(req.oidc.user);
 });
