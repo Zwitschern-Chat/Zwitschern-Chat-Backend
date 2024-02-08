@@ -60,16 +60,16 @@ app.get('/api/posts', async (req, res) => {
 
 // Endpoint zum Erstellen eines neuen Posts
 app.post('/api/post', async (req, res) => {
-  const { message, userId } = req.body;
+  const { message, user_number } = req.body;
 
   // Überprüfen Sie, ob alle Werte vorhanden sind
-  if (message === undefined || userId === undefined) {
-    return res.status(400).send('Fehlende Daten:message und userId sind erforderlich.');
+  if (message === undefined || user_number === undefined) {
+    return res.status(400).send('Fehlende Daten:message und user_number sind erforderlich.');
   }
 
   try {
     const connection = await mysql.createConnection(dbConfig);
-    const [rows, fields] = await connection.execute('INSERT INTO post (message, user_number) VALUES (?, ?);', [message, userId]);
+    const [rows, fields] = await connection.execute('INSERT INTO post (message, user_number) VALUES (?, ?);', [message, user_number]);
     await connection.end();
     res.json({ success: true, message: 'Post erfolgreich erstellt.', postId: rows.insertId });
   } catch (error) {
