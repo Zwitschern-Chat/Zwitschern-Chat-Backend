@@ -75,16 +75,16 @@ app.get('/api/posts', async (req, res) => {
 });
 
 app.post('/api/post', async (req, res) => {
-  const { title, body, userId } = req.body;
+  const { body, userId } = req.body;
 
   // Überprüfen Sie, ob alle Werte vorhanden sind
-  if (title === undefined || body === undefined || userId === undefined) {
-    return res.status(400).send('Fehlende Daten: title, body und userId sind erforderlich.');
+  if (body === undefined || userId === undefined) {
+    return res.status(400).send('Fehlende Daten:body und userId sind erforderlich.');
   }
 
   try {
     const connection = await mysql.createConnection(dbConfig);
-    const [rows, fields] = await connection.execute('INSERT INTO post (title, body, user_id) VALUES (?, ?, ?);', [title, body, userId]);
+    const [rows, fields] = await connection.execute('INSERT INTO post (body, user_id) VALUES (?, ?, ?);', [body, userId]);
     await connection.end();
     res.json({ success: true, message: 'Post erfolgreich erstellt.', postId: rows.insertId });
   } catch (error) {
