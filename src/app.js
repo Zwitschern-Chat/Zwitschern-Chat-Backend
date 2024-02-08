@@ -80,12 +80,12 @@ app.post('/api/post', async (req, res) => {
 
 
 // Endpoint zum Abrufen eines Nutzers
-app.get('/api/user/:id', async (req, res) => {
-  const { id } = req.params;
+app.get('/api/user/:sub', async (req, res) => {
+  const { sub } = req.params;
 
   try {
     const connection = await mysql.createConnection(dbConfig);
-    const [rows, fields] = await connection.execute('SELECT * FROM user WHERE id = ?;', [id]);
+    const [rows, fields] = await connection.execute('SELECT * FROM user WHERE sub = ?;', [sub]);
     await connection.end();
 
     if (rows.length === 0) {
