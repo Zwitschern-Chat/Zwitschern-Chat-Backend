@@ -92,7 +92,7 @@ app.get('/api/users', async (req, res) => {
 
 // Endpoint zum Abrufen von Nutzer Informationen anhand der number
 app.get('/api/user/:number', async (req, res) => {
-  const { user_number } = req.params;
+  const { number } = req.params;
 
   try {
     const connection = await mysql.createConnection(dbConfig);
