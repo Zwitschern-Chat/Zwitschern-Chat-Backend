@@ -84,7 +84,7 @@ app.post('/api/post', async (req, res) => {
 
   try {
     const connection = await mysql.createConnection(dbConfig);
-    const [rows, fields] = await connection.execute('INSERT INTO post (body, user_id) VALUES (?, ?, ?);', [body, userId]);
+    const [rows, fields] = await connection.execute('INSERT INTO post (body, user_id) VALUES (?, ?);', [body, userId]);
     await connection.end();
     res.json({ success: true, message: 'Post erfolgreich erstellt.', postId: rows.insertId });
   } catch (error) {
