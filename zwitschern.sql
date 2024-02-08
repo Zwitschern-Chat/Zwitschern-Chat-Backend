@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Erstellungszeit: 07. Feb 2024 um 15:13
+-- Erstellungszeit: 08. Feb 2024 um 23:22
 -- Server-Version: 8.0.36-0ubuntu0.22.04.1
 -- PHP-Version: 8.1.2-1ubuntu2.14
 
@@ -29,9 +29,8 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `post` (
   `id` int NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `body` text,
-  `user_id` int DEFAULT NULL,
+  `message` text,
+  `user_number` int DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
@@ -39,9 +38,9 @@ CREATE TABLE `post` (
 -- Daten für Tabelle `post`
 --
 
-INSERT INTO `post` (`id`, `title`, `body`, `user_id`, `created_at`) VALUES
-(1, 'Titel des post ist toll', 'Dies ist der Inhalt des post.', 21, '2023-11-07 08:04:08'),
-(5, 'Ich liebe meine Freundin: ', 'Selina <3', 21, '2024-02-06 23:23:40');
+INSERT INTO `post` (`id`, `message`, `user_number`, `created_at`) VALUES
+(24, 'Test123', 1, '2024-02-08 23:11:10'),
+(25, 'Läuft', 1, '2024-02-08 23:13:09');
 
 -- --------------------------------------------------------
 
@@ -50,22 +49,22 @@ INSERT INTO `post` (`id`, `title`, `body`, `user_id`, `created_at`) VALUES
 --
 
 CREATE TABLE `user` (
-  `id` int NOT NULL,
+  `sub` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `username` varchar(255) NOT NULL,
   `profile_picture` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `email` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `language` varchar(255) DEFAULT NULL,
-  `bio` text
+  `bio` text,
+  `number` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 --
 -- Daten für Tabelle `user`
 --
 
-INSERT INTO `user` (`id`, `username`, `profile_picture`, `created_at`, `email`, `language`, `bio`) VALUES
-(21, 'civixi8632', 'https://s.gravatar.com/avatar/ff759f18ad5f7a9c49424e8baeea500a?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fci.png', '2024-02-06 20:51:35', 'civixi8632@ziragold.com', NULL, NULL),
-(22, 'mogon95734', 'https://s.gravatar.com/avatar/52bf2d597dd0d5b1a0e5e092bb0afb18?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fmo.png', '2024-02-06 21:28:52', 'mogon95734@cubene.com', NULL, NULL);
+INSERT INTO `user` (`sub`, `username`, `profile_picture`, `created_at`, `language`, `bio`, `number`) VALUES
+('auth0|659d51e4c71804525a2635ae', 'civixi8632', 'https://s.gravatar.com/avatar/ff759f18ad5f7a9c49424e8baeea500a?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fci.png', '2024-02-08 22:50:15', NULL, NULL, 1),
+('auth0|65c2a49349ef8564a0ecda34', 'mogon95734', 'https://s.gravatar.com/avatar/52bf2d597dd0d5b1a0e5e092bb0afb18?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fmo.png', '2024-02-08 23:02:36', NULL, NULL, 2);
 
 --
 -- Indizes der exportierten Tabellen
@@ -76,13 +75,14 @@ INSERT INTO `user` (`id`, `username`, `profile_picture`, `created_at`, `email`, 
 --
 ALTER TABLE `post`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `user_id` (`user_number`);
 
 --
 -- Indizes für die Tabelle `user`
 --
 ALTER TABLE `user`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`sub`),
+  ADD UNIQUE KEY `number` (`number`);
 
 --
 -- AUTO_INCREMENT für exportierte Tabellen
@@ -92,23 +92,13 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT für Tabelle `post`
 --
 ALTER TABLE `post`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT für Tabelle `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
-
---
--- Constraints der exportierten Tabellen
---
-
---
--- Constraints der Tabelle `post`
---
-ALTER TABLE `post`
-  ADD CONSTRAINT `post_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+  MODIFY `number` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
