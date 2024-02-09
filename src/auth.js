@@ -152,7 +152,7 @@ app.get('/auth/logout', (req, res) => {
   });
 });
 
-// Only to debug: Check if user is logged in or not
+// Check if user is logged in or not
 app.get('/auth/check', (req, res) => {
   res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
 });
