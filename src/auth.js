@@ -188,6 +188,52 @@ app.post('/auth/v1.0/username', requiresAuth(), async (req, res) => {
   }
 });
 
+// Endpoint to change own bio, checks if user is logged (get sub, and compare user_number with number)
+app.post('/auth/v1.0/bio', requiresAuth(), async (req, res) => {
+  const sub = req.oidc.user.sub;
+  let { bio, user_number } = req.body; // Get data from the request body
+
+  // Prevent sql injection, xss and other attacks here use sanitize-html package  
+  bio = sanitizeHtml(bio, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
+  user_number = sanitizeHtml(user_number, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
+
+  // Use sub for to get number to compare with user_number
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+    const [rows, fields] = await connection.execute('SELECT number FROM user WHERE sub = ?;', [sub]);
+    await connection.end();
+
+    if (rows.length === 0) {
+      res.status(404).send('User not found.');
+    } else {
+      number = rows[0].number;
+    }
+  } catch (error) {
+    console.error('Error accessing the database: ', error.message);
+    res.status(500).send('Error accessing the database: ', error.message);
+  }
+
+  if (user_number != number) {
+    return res.status(403).send('Not authorized! ' + user_number + '!=' + number);
+  }
+
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+    const [rows, fields] = await connection.execute('UPDATE user SET bio = ? WHERE sub = ?;', [bio, sub]);
+    await connection.end();
+    res.json({ success: true, message: 'Bio changed successfully.' });
+  } catch (error) {
+    console.error('Error accessing the database: ', error.message);
+    res.status(500).send('Error accessing the database: ', error.message);
+  }
+});
+
 
 // Endpoint to get all user data from auth0 
 app.get('/auth/v1.0/user', requiresAuth(), (req, res) => {
@@ -199,9 +245,9 @@ app.get('/auth/v1.0/login', requiresAuth(), (req, res) => {
   res.redirect('https://zwitschern.chat');
   });
 
-// Account and redirect to account
-app.get('/auth/v1.0/account', requiresAuth(), (req, res) => {
-  res.redirect('/account');
+// User profile and redirect to profile
+app.get('/auth/v1.0/profile', requiresAuth(), (req, res) => {
+  res.redirect('/profile');
 });
   
 // Logout and redirect to home

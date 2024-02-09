@@ -105,7 +105,33 @@ app.get('/api/v1.0/user_num/:number', async (req, res) => {
 
   try {
     const connection = await mysql.createConnection(dbConfig);
-    const [rows, fields] = await connection.execute('SELECT username, profile_picture FROM user WHERE number = ?;', [number]);
+    const [rows, fields] = await connection.execute('SELECT username, profile_picture, created_at, bio FROM user WHERE number = ?;', [number]);
+    await connection.end();
+
+    if (rows.length === 0) {
+      res.status(404).send('User not found.');
+    } else {
+      res.json(rows[0]);
+    }
+  } catch (error) {
+    console.error('Error accessing the database: ', error.message);
+    res.status(500).send('Error accessing the database: ', error.message);
+  }
+});
+
+// Endpoint for retrieving information of a user based on username
+app.get('/api/v1.0/user/:username', async (req, res) => {
+  let { username } = req.params;
+
+  // To prevent sql injection, xss and other attacks here use sanitize-html package
+  username = sanitizeHtml(username, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
+
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+    const [rows, fields] = await connection.execute('SELECT number, profile_picture, created_at, bio FROM user WHERE username = ?;', [username]);
     await connection.end();
 
     if (rows.length === 0) {
