@@ -129,6 +129,65 @@ app.post('/auth/v1.0/post', requiresAuth(), async (req, res) => {
   }
 });
 
+// Endpoint to change own username, checks if user is logged (get sub, and compare user_number with number) in and if the username is not already taken
+app.post('/auth/v1.0/username', requiresAuth(), async (req, res) => {
+  const sub = req.oidc.user.sub;
+  let { username, user_number } = req.body; // Get data from the request body
+
+  // Prevent sql injection, xss and other attacks here use sanitize-html package  
+  username = sanitizeHtml(username, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
+  user_number = sanitizeHtml(user_number, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
+
+  // Use sub for to get number to compare with user_number
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+    const [rows, fields] = await connection.execute('SELECT number FROM user WHERE sub = ?;', [sub]);
+    await connection.end();
+
+    if (rows.length === 0) {
+      res.status(404).send('User not found.');
+    } else {
+      number = rows[0].number;
+    }
+  } catch (error) {
+    console.error('Error accessing the database: ', error.message);
+    res.status(500).send('Error accessing the database: ', error.message);
+  }
+
+  if (user_number != number) {
+    return res.status(403).send('Not authorized! ' + user_number + '!=' + number);
+  }
+
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+    const [rows, fields] = await connection.execute('SELECT number FROM user WHERE username = ?;', [username]);
+    await connection.end();
+
+    if (rows.length > 0) {
+      return res.status(409).send('Username already taken.');
+    }
+  } catch (error) {
+    console.error('Error accessing the database: ', error.message);
+    res.status(500).send('Error accessing the database: ', error.message);
+  }
+
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+    const [rows, fields] = await connection.execute('UPDATE user SET username = ? WHERE sub = ?;', [username, sub]);
+    await connection.end();
+    res.json({ success: true, message: 'Username changed successfully.' });
+  } catch (error) {
+    console.error('Error accessing the database: ', error.message);
+    res.status(500).send('Error accessing the database: ', error.message);
+  }
+});
+
 
 // Endpoint to get all user data from auth0 
 app.get('/auth/v1.0/user', requiresAuth(), (req, res) => {
