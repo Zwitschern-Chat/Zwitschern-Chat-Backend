@@ -1,3 +1,4 @@
+// Imports
 const express = require('express');
 const mysql = require('mysql2/promise');
 const app = express();
@@ -9,16 +10,15 @@ const corsOptions = {
   optionsSuccessStatus: 200 
 };
 
+// Running the server on port 3000
+const port = 3000;
+
 app.use(cors(corsOptions));
 
-// For parsing application/json
+// Middleware for parsing JSON requests
 app.use(express.json()); 
 // For parsing application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
-
-
-const port = 3000;
-
 
 // Function for checking command-line arguments
 function checkForDevArg() {
@@ -40,7 +40,6 @@ const dbConfig = checkForDevArg() ? {
   password: 'P[u5t9.eB0R1LLVK',
   database: 'zwitschern'
 };
-
 
 // Endpoint for retrieving all posts
 app.get('/api/posts', async (req, res) => {
@@ -81,8 +80,7 @@ app.get('/api/post/:id', async (req, res) => {
   }
 });
 
-
-// Endpoint for retrieving all users (excluding sensitive data like sub)
+// Endpoint for retrieving all users (excluding sensitive data)
 app.get('/api/users', async (req, res) => {
   try {
     const connection = await mysql.createConnection(dbConfig);
@@ -121,8 +119,7 @@ app.get('/api/user_num/:number', async (req, res) => {
   }
 });
 
-
-// Endpoint for retrieving user information based on sub (Auth0 identifier)
+// Endpoint for retrieving own user information based on sub (Auth0 identifier)
 app.get('/api/user_sub/:sub', async (req, res) => {
   let { sub } = req.params;
 
@@ -131,7 +128,6 @@ app.get('/api/user_sub/:sub', async (req, res) => {
     allowedTags: [],
     allowedAttributes: {}
   });
-
 
   try {
     const connection = await mysql.createConnection(dbConfig);
@@ -149,8 +145,7 @@ app.get('/api/user_sub/:sub', async (req, res) => {
   }
 });
 
-
-// Endpoint zum Abrufen aller Posts eines Nutzers
+// Endpoint for retrieving all posts from a user based on user number
 app.get('/api/user_posts/:number', async (req, res) => {
   let { number } = req.params;
 
@@ -176,7 +171,7 @@ app.get('/api/user_posts/:number', async (req, res) => {
   }
 });
 
-
+// Start the server
 app.listen(port, () => {
 // Outputs a message indicating which configuration is being used
   if (checkForDevArg()) {
