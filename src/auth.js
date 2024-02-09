@@ -77,11 +77,9 @@ app.use(async (req, res, next) => {
 
 
 // Endpoint zum Erstellen eines neuen Posts
-app.post('/auth/post/:user_number/:message',  requiresAuth(), async (req, res) => {
-
+app.post('/auth/post', requiresAuth(), async (req, res) => {
   const sub = req.oidc.user.sub;
-  const message = req.params.message;
-  const user_number = req.params.user_number;
+  let { message, user_number } = req.body; // Daten aus dem Anfragekörper holen
 
   // Überprüfen Sie, ob alle Werte vorhanden sind
   if (message === undefined || user_number === undefined) {
