@@ -96,7 +96,7 @@ app.get('/api/users', async (req, res) => {
 
 // Endpoint zum Abrufen Informationen eines Nutzers anhand der User-Nummer
 app.get('/api/user_num/:number', async (req, res) => {
-  const { number } = req.params;
+  let { number } = req.params;
 
   // To prevent sql injection, xss and other attacks here use sanitize-html package
   number = sanitizeHtml(number, {
