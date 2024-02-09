@@ -30,7 +30,9 @@ const config = {
     clientID: '6dHWgZ691XG9pTlUar21zBrdVEvctyFP',
     issuerBaseURL: 'https://dev-x6a4ln1r3kk4uz5p.us.auth0.com'
   };
-  const port = 5000;
+
+// Running the server on port 5000
+const port = 5000;
 
 app.use(auth(config));
 
