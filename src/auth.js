@@ -27,7 +27,7 @@ const config = {
     authRequired: false,
     auth0Logout: true,
     secret: process.env.SECRET,   // Secrect import from .env file
-    baseURL: 'https://zwitschern.chat/auth',
+    baseURL: 'https://zwitschern.chat/auth/v1.0',
     clientID: '6dHWgZ691XG9pTlUar21zBrdVEvctyFP',
     issuerBaseURL: 'https://dev-x6a4ln1r3kk4uz5p.us.auth0.com'
   };
