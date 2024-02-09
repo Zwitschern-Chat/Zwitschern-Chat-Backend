@@ -98,6 +98,12 @@ app.get('/api/users', async (req, res) => {
 app.get('/api/user_num/:number', async (req, res) => {
   const { number } = req.params;
 
+  // To prevent sql injection, xss and other attacks here use sanitize-html package
+  number = sanitizeHtml(number, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
+
   try {
     const connection = await mysql.createConnection(dbConfig);
     const [rows, fields] = await connection.execute('SELECT username, profile_picture FROM user WHERE number = ?;', [number]);
@@ -117,7 +123,14 @@ app.get('/api/user_num/:number', async (req, res) => {
 
 // Endpoint zum Abrufen der eigenen Nutzer Infos anhand von sub (Auth0-Identifikator)
 app.get('/api/user_sub/:sub', async (req, res) => {
-  const { sub } = req.params;
+  let { sub } = req.params;
+
+  // To prevent sql injection, xss and other attacks here use sanitize-html package
+  sub = sanitizeHtml(sub, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
+
 
   try {
     const connection = await mysql.createConnection(dbConfig);
