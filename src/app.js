@@ -11,23 +11,23 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// Zum Parsen von application/json
+// For parsing application/json
 app.use(express.json()); 
-// Zum Parsen von application/x-www-form-urlencoded
+// For parsing application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 
 
 const port = 3000;
 
 
-// Funktion zum Überprüfen von Command-Line-Argumenten
+// Function for checking command-line arguments
 function checkForDevArg() {
-  return process.argv.includes('-dev'); // Nutze den Befehl "node app.js -dev" um die lokale Datenbank zu verwenden
+  return process.argv.includes('-dev'); // Use the command "node app.js -dev" to use the local database.
 }
 
-// Entscheiden Sie, welche Datenbankkonfiguration basierend auf dem Argument verwendet werden soll
-// Wenn das '-dev' Argument vorhanden ist, wird 'localhost' als Host verwendet
-// Andernfalls wird die Produktionsdatenbankkonfiguration verwendet
+// Decide which database configuration to use based on the argument
+// If the '-dev' argument is present, 'localhost' will be used as the host
+// Otherwise, the production database configuration will be used.
 const dbConfig = checkForDevArg() ? {
   host: 'localhost',
   user: 'root',
@@ -42,7 +42,7 @@ const dbConfig = checkForDevArg() ? {
 };
 
 
-// Endpoint zum Abrufen aller Posts
+// Endpoint for retrieving all posts
 app.get('/api/posts', async (req, res) => {
   try {
     const connection = await mysql.createConnection(dbConfig);
@@ -63,7 +63,7 @@ app.get('/api/posts', async (req, res) => {
   }
 });
 
-// Endpoint zum Abrufen eines Posts anhand der Post-ID
+// Endpoint for retrieving a post by post ID
 app.get('/api/post/:id', async (req, res) => {
   try {
     const connection = await mysql.createConnection(dbConfig);
@@ -82,11 +82,11 @@ app.get('/api/post/:id', async (req, res) => {
 });
 
 
-// Endpoint zum Abrufen aller Nutzer (geheime Daten wie sub)
+// Endpoint for retrieving all users (excluding sensitive data like sub)
 app.get('/api/users', async (req, res) => {
   try {
     const connection = await mysql.createConnection(dbConfig);
-    const [rows, fields] = await connection.execute('SELECT number, username, profile_picture FROM user;');
+    const [rows, fields] = await connection.execute('SELECT user_number, username, profile_picture FROM user;');
     await connection.end();
     res.json(rows);
   } catch (error) {
@@ -95,7 +95,7 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
-// Endpoint zum Abrufen Informationen eines Nutzers anhand der User-Nummer
+// Endpoint for retrieving information of a user based on user number
 app.get('/api/user_num/:number', async (req, res) => {
   let { number } = req.params;
 
@@ -122,7 +122,7 @@ app.get('/api/user_num/:number', async (req, res) => {
 });
 
 
-// Endpoint zum Abrufen der eigenen Nutzer Infos anhand von sub (Auth0-Identifikator)
+// Endpoint for retrieving user information based on sub (Auth0 identifier)
 app.get('/api/user_sub/:sub', async (req, res) => {
   let { sub } = req.params;
 
@@ -178,7 +178,7 @@ app.get('/api/user_posts/:number', async (req, res) => {
 
 
 app.listen(port, () => {
-  // Gibt eine Meldung aus, welche Konfiguration verwendet wird
+// Outputs a message indicating which configuration is being used
   if (checkForDevArg()) {
     console.log(`Entwicklungsmodus aktiviert: API hört auf Port ${port} (lokal)`);
   } else {
