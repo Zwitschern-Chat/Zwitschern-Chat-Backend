@@ -51,14 +51,14 @@ app.get('/api/posts', async (req, res) => {
     await connection.end();
 
     if (rows.length === 0) {
-      res.status(404).send('Keine Posts gefunden.');
+      res.status(404).send('No posts found.');
     } else {
       res.json(rows);
     }
     
   } catch (error) {
-    console.error('Fehler beim Zugriff auf die Datenbank: ', error.message);
-    res.status(500).send('Fehler beim Zugriff auf die Datenbank: ' + error.message);
+    console.error('Error accessing the database: ', error.message);
+    res.status(500).send('Error accessing the database: ', error.message);
   }
 });
 
@@ -70,13 +70,13 @@ app.get('/api/post/:id', async (req, res) => {
     await connection.end();
 
     if (rows.length === 0) {
-      res.status(404).send('Post nicht gefunden.');
+      res.status(404).send('Post not found.');
     } else {
       res.json(rows[0]);
     }
   } catch (error) {
-    console.error('Fehler beim Zugriff auf die Datenbank: ', error.message);
-    res.status(500).send('Fehler beim Zugriff auf die Datenbank: ' + error.message);
+    console.error('Error accessing the database: ', error.message);
+    res.status(500).send('Error accessing the database: ', error.message);
   }
 });
 
@@ -88,8 +88,8 @@ app.get('/api/users', async (req, res) => {
     await connection.end();
     res.json(rows);
   } catch (error) {
-    console.error('Fehler beim Zugriff auf die Datenbank: ', error.message);
-    res.status(500).send('Fehler beim Zugriff auf die Datenbank: ' + error.message);
+    console.error('Error accessing the database: ', error.message);
+    res.status(500).send('Error accessing the database: ', error.message);
   }
 });
 
@@ -109,13 +109,13 @@ app.get('/api/user_num/:number', async (req, res) => {
     await connection.end();
 
     if (rows.length === 0) {
-      res.status(404).send('Nutzer nicht gefunden.');
+      res.status(404).send('User not found.');
     } else {
       res.json(rows[0]);
     }
   } catch (error) {
-    console.error('Fehler beim Zugriff auf die Datenbank: ', error.message);
-    res.status(500).send('Fehler beim Zugriff auf die Datenbank: ' + error.message);
+    console.error('Error accessing the database: ', error.message);
+    res.status(500).send('Error accessing the database: ', error.message);
   }
 });
 
@@ -135,13 +135,13 @@ app.get('/api/user_sub/:sub', async (req, res) => {
     await connection.end();
 
     if (rows.length === 0) {
-      res.status(404).send('Nutzer nicht gefunden.');
+      res.status(404).send('User not found.');
     } else {
       res.json(rows[0]);
     }
   } catch (error) {
-    console.error('Fehler beim Zugriff auf die Datenbank: ', error.message);
-    res.status(500).send('Fehler beim Zugriff auf die Datenbank: ' + error.message);
+    console.error('Error accessing the database: ', error.message);
+    res.status(500).send('Error accessing the database: ', error.message);
   }
 });
 
@@ -161,13 +161,13 @@ app.get('/api/user_posts/:number', async (req, res) => {
     await connection.end();
 
     if (rows.length === 0) {
-      res.status(404).send('Keine Posts gefunden.');
+      res.status(404).send('No posts found.');
     } else {
       res.json(rows);
     }
   } catch (error) {
-    console.error('Fehler beim Zugriff auf die Datenbank: ', error.message);
-    res.status(500).send('Fehler beim Zugriff auf die Datenbank: ' + error.message);
+    console.error('Error accessing the database: ', error.message);
+    res.status(500).send('Error accessing the database: ', error.message);
   }
 });
 
