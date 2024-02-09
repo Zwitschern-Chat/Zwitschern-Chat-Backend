@@ -91,7 +91,7 @@ app.get('/api/users', async (req, res) => {
 });
 
 // Endpoint zum Abrufen von Nutzer Informationen anhand der number
-app.get('/api/user/:number', async (req, res) => {
+app.get('/api/user_num/:number', async (req, res) => {
   const { number } = req.params;
 
   try {
@@ -112,7 +112,7 @@ app.get('/api/user/:number', async (req, res) => {
 
 
 // Endpoint zum Abrufen der eigenen Nutzer Infos anhand von sub (Auth0-Identifikator)
-app.get('/api/user/:sub', async (req, res) => {
+app.get('/api/user_sub/:sub', async (req, res) => {
   const { sub } = req.params;
 
   try {
