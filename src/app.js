@@ -86,7 +86,7 @@ app.get('/api/posts', async (req, res) => {
 app.get('/api/users', async (req, res) => {
   try {
     const connection = await mysql.createConnection(dbConfig);
-    const [rows, fields] = await connection.execute('SELECT user_number, username, profile_picture FROM user;');
+    const [rows, fields] = await connection.execute('SELECT number, username, profile_picture FROM user;');
     await connection.end();
     res.json(rows);
   } catch (error) {
