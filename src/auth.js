@@ -84,7 +84,7 @@ app.use(async (req, res, next) => {
 
 
 // Endpoint to create a new post as chat message from a user
-app.post('/auth/post', requiresAuth(), async (req, res) => {
+app.post('/auth/v1.0/post', requiresAuth(), async (req, res) => {
   const sub = req.oidc.user.sub;
   let { message, user_number } = req.body; // Get data from the request body
 
@@ -131,41 +131,41 @@ app.post('/auth/post', requiresAuth(), async (req, res) => {
 
 
 // Endpoint to get all user data from auth0 
-app.get('/auth/user', requiresAuth(), (req, res) => {
+app.get('/auth/v1.0/user', requiresAuth(), (req, res) => {
   res.json(req.oidc.user);
 });
 
 // Login and redirect to home
-app.get('/auth/login', requiresAuth(), (req, res) => {
+app.get('/auth/v1.0/login', requiresAuth(), (req, res) => {
   res.redirect('https://zwitschern.chat');
   });
 
 // Account and redirect to account
-app.get('/auth/account', requiresAuth(), (req, res) => {
+app.get('/auth/v1.0/account', requiresAuth(), (req, res) => {
   res.redirect('/account');
 });
   
 // Logout and redirect to home
-app.get('/auth/logout', (req, res) => {
+app.get('/auth/v1.0/logout', (req, res) => {
   res.oidc.logout({
     returnTo: 'https://zwitschern.chat',
   });
 });
 
 // Check if user is logged in or not
-app.get('/auth/check', (req, res) => {
+app.get('/auth/v1.0/check', (req, res) => {
   res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out');
 });
 
 // Callback get for auth0 needed
-app.get('/auth/callback', (req, res) => {
+app.get('/auth/v1.0/callback', (req, res) => {
   res.oidc.callback({
     redirectUri: 'http://localhost:3000/callback',
   });
 });
 
 // Callback post for auth0 needed
-app.post('/auth/callback', express.urlencoded({ extended: false }), (req, res) =>
+app.post('/auth/v1.0/callback', express.urlencoded({ extended: false }), (req, res) =>
 res.oidc.callback({
   redirectUri: 'http://localhost:3000/callback',
   }

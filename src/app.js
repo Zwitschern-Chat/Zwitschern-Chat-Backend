@@ -42,7 +42,7 @@ const dbConfig = checkForDevArg() ? {
 };
 
 // Endpoint for retrieving all posts
-app.get('/api/posts', async (req, res) => {
+app.get('/api/v1.0/posts', async (req, res) => {
   try {
     const connection = await mysql.createConnection(dbConfig);
     
@@ -63,7 +63,7 @@ app.get('/api/posts', async (req, res) => {
 });
 
 // Endpoint for retrieving a post by post ID
-app.get('/api/post/:id', async (req, res) => {
+app.get('/api/v1.0/post/:id', async (req, res) => {
   try {
     const connection = await mysql.createConnection(dbConfig);
     const [rows, fields] = await connection.execute('SELECT * FROM post WHERE id = ?;', [req.params.id]);
@@ -81,10 +81,10 @@ app.get('/api/post/:id', async (req, res) => {
 });
 
 // Endpoint for retrieving all users (excluding sensitive data)
-app.get('/api/users', async (req, res) => {
+app.get('/api/v1.0/users', async (req, res) => {
   try {
     const connection = await mysql.createConnection(dbConfig);
-    const [rows, fields] = await connection.execute('SELECT user_number, username, profile_picture FROM user;');
+    const [rows, fields] = await connection.execute('SELECT number, username, profile_picture FROM user;');
     await connection.end();
     res.json(rows);
   } catch (error) {
@@ -94,7 +94,7 @@ app.get('/api/users', async (req, res) => {
 });
 
 // Endpoint for retrieving information of a user based on user number
-app.get('/api/user_num/:number', async (req, res) => {
+app.get('/api/v1.0/user_num/:number', async (req, res) => {
   let { number } = req.params;
 
   // To prevent sql injection, xss and other attacks here use sanitize-html package
@@ -120,7 +120,7 @@ app.get('/api/user_num/:number', async (req, res) => {
 });
 
 // Endpoint for retrieving own user information based on sub (Auth0 identifier)
-app.get('/api/user_sub/:sub', async (req, res) => {
+app.get('/api/v1.0/user_sub/:sub', async (req, res) => {
   let { sub } = req.params;
 
   // To prevent sql injection, xss and other attacks here use sanitize-html package
@@ -146,7 +146,7 @@ app.get('/api/user_sub/:sub', async (req, res) => {
 });
 
 // Endpoint for retrieving all posts from a user based on user number
-app.get('/api/user_posts/:number', async (req, res) => {
+app.get('/api/v1.0/user_posts/:number', async (req, res) => {
   let { number } = req.params;
 
   // To prevent sql injection, xss and other attacks here use sanitize-html package
