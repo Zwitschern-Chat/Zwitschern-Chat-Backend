@@ -3,6 +3,7 @@ const app = express();
 const { auth, requiresAuth } = require('express-openid-connect');
 require('dotenv').config()
 const mysql = require('mysql2/promise');
+const sanitizeHtml = require('sanitize-html');
 
 // Entscheiden Sie, welche Datenbankkonfiguration basierend auf dem Argument verwendet werden soll
 // Wenn das '-dev' Argument vorhanden ist, wird 'localhost' als Host verwendet
@@ -73,6 +74,60 @@ app.use(async (req, res, next) => {
   }
   next();
 });
+
+
+// Endpoint zum Erstellen eines neuen Posts
+app.post('/auth/post',  requiresAuth(), async (req, res) => {
+
+  const sub = req.oidc.user.sub;
+  const { message, user_number } = req.body;
+
+  // Überprüfen Sie, ob alle Werte vorhanden sind
+  if (message === undefined || user_number === undefined) {
+    return res.status(400).send('Fehlende Daten: message und user_number sind erforderlich.');
+  } else {
+        // Do prevent sql injection, xss and other attacks here use sanitize-html package  
+        message = sanitizeHtml(message, {
+          allowedTags: [],
+          allowedAttributes: {}
+        });
+        user_number = sanitizeHtml(user_number, {
+          allowedTags: [],
+          allowedAttributes: {}
+        });
+  }
+  
+  // use sub for to get number to compare with user_number
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+    const [rows, fields] = await connection.execute('SELECT number FROM user WHERE sub = ?;', [sub]);
+    await connection.end();
+
+    if (rows.length === 0) {
+      res.status(404).send('Benutzer nicht gefunden.');
+    } else {
+      number = rows[0].number;
+    }
+  } catch (error) {
+    console.error('Fehler beim Zugriff auf die Datenbank: ', error.message);
+    res.status(500).send('Fehler beim Zugriff auf die Datenbank: ' + error.message);
+  }
+
+  if (!user_number === number) {
+    return res.status(403).send('Nicht autorisiert: Sie können nur Posts für Ihren eigenen Benutzer erstellen.');
+  }
+
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+    const [rows, fields] = await connection.execute('INSERT INTO post (message, user_number) VALUES (?, ?);', [message, user_number]);
+    await connection.end();
+    res.json({ success: true, message: 'Post erfolgreich erstellt.', postId: rows.insertId });
+  } catch (error) {
+    console.error('Fehler beim Zugriff auf die Datenbank: ', error.message);
+    res.status(500).send('Fehler beim Zugriff auf die Datenbank: ' + error.message);
+  }
+});
+
 
 
 

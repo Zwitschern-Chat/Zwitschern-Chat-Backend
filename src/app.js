@@ -41,25 +41,24 @@ const dbConfig = checkForDevArg() ? {
 };
 
 
-// Endpoint zum Erstellen eines neuen Posts
-app.post('/api/post', async (req, res) => {
-  const { message, user_number } = req.body;
-
-  // Überprüfen Sie, ob alle Werte vorhanden sind
-  if (message === undefined || user_number === undefined) {
-    return res.status(400).send('Fehlende Daten:message und user_number sind erforderlich.');
-  }
-
+// Endpoint zum Abrufen eines Posts anhand der Post-ID
+app.get('/api/post/:id', async (req, res) => {
   try {
     const connection = await mysql.createConnection(dbConfig);
-    const [rows, fields] = await connection.execute('INSERT INTO post (message, user_number) VALUES (?, ?);', [message, user_number]);
+    const [rows, fields] = await connection.execute('SELECT * FROM post WHERE id = ?;', [req.params.id]);
     await connection.end();
-    res.json({ success: true, message: 'Post erfolgreich erstellt.', postId: rows.insertId });
+
+    if (rows.length === 0) {
+      res.status(404).send('Post nicht gefunden.');
+    } else {
+      res.json(rows[0]);
+    }
   } catch (error) {
     console.error('Fehler beim Zugriff auf die Datenbank: ', error.message);
     res.status(500).send('Fehler beim Zugriff auf die Datenbank: ' + error.message);
   }
 });
+
 
 // Endpoint zum Abrufen aller Posts
 app.get('/api/posts', async (req, res) => {
@@ -69,15 +68,20 @@ app.get('/api/posts', async (req, res) => {
     const [rows, fields] = await connection.execute('SELECT * FROM post;');
     
     await connection.end();
+
+    if (rows.length === 0) {
+      res.status(404).send('Keine Posts gefunden.');
+    } else {
+      res.json(rows);
+    }
     
-    res.json(rows);
   } catch (error) {
     console.error('Fehler beim Zugriff auf die Datenbank: ', error.message);
     res.status(500).send('Fehler beim Zugriff auf die Datenbank: ' + error.message);
   }
 });
 
-// Endpoint zum Abrufen aller Nutzer (ohne sub)
+// Endpoint zum Abrufen aller Nutzer (geheime Daten wie sub)
 app.get('/api/users', async (req, res) => {
   try {
     const connection = await mysql.createConnection(dbConfig);
@@ -90,7 +94,7 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
-// Endpoint zum Abrufen von Nutzer Informationen anhand der number
+// Endpoint zum Abrufen Informationen eines Nutzers anhand der User-Nummer
 app.get('/api/user_num/:number', async (req, res) => {
   const { number } = req.params;
 
