@@ -22,6 +22,7 @@ const dbConfig = checkForDevArg() ? {
   database: 'zwitschern'
 };
 
+// Auth0 configuration
 const config = {
     authRequired: false,
     auth0Logout: true,
@@ -30,11 +31,10 @@ const config = {
     clientID: '6dHWgZ691XG9pTlUar21zBrdVEvctyFP',
     issuerBaseURL: 'https://dev-x6a4ln1r3kk4uz5p.us.auth0.com'
   };
+app.use(auth(config));
 
 // Running the server on port 5000
 const port = 5000;
-
-app.use(auth(config));
 
 // Function for checking command-line arguments
 function checkForDevArg() {
@@ -43,6 +43,7 @@ function checkForDevArg() {
 
 // Middleware for parsing JSON requests
 app.use(express.json());
+
 
 // Middleware to check and update user data in database after each authentication
 app.use(async (req, res, next) => {
