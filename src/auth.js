@@ -110,8 +110,8 @@ app.post('/auth/post', requiresAuth(), async (req, res) => {
     res.status(500).send('Fehler beim Zugriff auf die Datenbank: ' + error.message);
   }
 
-  if (user_number !== number) {
-    return res.status(403).send('Nicht autorisiert: Sie können nur Posts für Ihren eigenen Benutzer erstellen.');
+  if (user_number != number) {
+    return res.status(403).send('Nicht autorisiert: Sie können nur Posts für Ihren eigenen Benutzer erstellen! ' + user_number + '!=' + number);
   }
 
   try {
