@@ -81,21 +81,16 @@ app.post('/auth/post', requiresAuth(), async (req, res) => {
   const sub = req.oidc.user.sub;
   let { message, user_number } = req.body; // Daten aus dem Anfragekörper holen
 
-  // Überprüfen Sie, ob alle Werte vorhanden sind
-  if (message === undefined || user_number === undefined) {
-    return res.status(400).send('Fehlende Daten: message und user_number sind erforderlich.');
-  } else {
-        // Do prevent sql injection, xss and other attacks here use sanitize-html package  
-        message = sanitizeHtml(message, {
-          allowedTags: [],
-          allowedAttributes: {}
-        });
-        user_number = sanitizeHtml(user_number, {
-          allowedTags: [],
-          allowedAttributes: {}
-        });
-  }
-  
+    // Do prevent sql injection, xss and other attacks here use sanitize-html package  
+    message = sanitizeHtml(message, {
+      allowedTags: [],
+      allowedAttributes: {}
+    });
+    user_number = sanitizeHtml(user_number, {
+      allowedTags: [],
+      allowedAttributes: {}
+    });
+
   // use sub for to get number to compare with user_number
   try {
     const connection = await mysql.createConnection(dbConfig);
