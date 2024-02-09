@@ -38,6 +38,9 @@ function checkForDevArg() {
   return process.argv.includes('-dev'); // Nutze den Befehl "node app.js -dev" um die lokale Datenbank zu verwenden
 }
 
+// Middleware, um JSON-Anfragen zu parsen
+app.use(express.json());
+
 // Middleware to check and update user data in database after each authentication
 app.use(async (req, res, next) => {
   if (req.oidc.isAuthenticated()) {
