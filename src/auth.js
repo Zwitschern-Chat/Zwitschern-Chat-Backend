@@ -63,9 +63,9 @@ app.use(async (req, res, next) => {
 
       if (users.length > 0) {
         const user = users[0];
-        // User already exists, optionally update the username and profile picture
-        const updateSql = `UPDATE user SET username = ?, profile_picture = ? WHERE sub = ?;`;
-        await connection.execute(updateSql, [userData.username, userData.profile_picture, userData.sub]);
+        // User already exists, optionally update profile picture
+        const updateSql = `UPDATE user SET profile_picture = ? WHERE sub = ?;`;
+        await connection.execute(updateSql, [userData.profile_picture, userData.sub]);
         console.log('Userdata updated.');
       } else {
         // User does not exist, insert the new user
