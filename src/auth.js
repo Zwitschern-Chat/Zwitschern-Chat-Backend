@@ -9,6 +9,7 @@ const sanitizeHtml = require('sanitize-html');
 // Decide which database configuration to use based on the argument
 // If the '-dev' argument is present, 'localhost' will be used as the host
 // Otherwise, the production database configuration will be used.
+// .env file is used to store the database configuration and auth0 configuration
 const dbConfig = checkForDevArg() ? {
   host: process.env.DB_HOST_DEV,
   user: process.env.DB_USER_DEV,
