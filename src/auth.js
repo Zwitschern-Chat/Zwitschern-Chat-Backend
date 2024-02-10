@@ -234,6 +234,124 @@ app.post('/auth/v1.0/bio', requiresAuth(), async (req, res) => {
   }
 });
 
+// Endpoint to change own message, checks if user is logged (get sub to get number & get user_number from post by id '/api/v1.0/post_user/:id' and compare user_number with number)
+app.put('/auth/v1.0/post/:id', requiresAuth(), async (req, res) => {
+  const sub = req.oidc.user.sub;
+  let { message, user_number } = req.body; // Get data from the request body
+
+  // Prevent sql injection, xss and other attacks here use sanitize-html package  
+  message = sanitizeHtml(message, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
+  user_number = sanitizeHtml(user_number, {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
+
+  // Use sub for to get number to compare with user_number
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+    const [rows, fields] = await connection.execute('SELECT number FROM user WHERE sub = ?;', [sub]);
+    await connection.end();
+
+    if (rows.length === 0) {
+      res.status(404).send('User not found.');
+    } else {
+      number = rows[0].number;
+    }
+  } catch (error) {
+    console.error('Error accessing the database: ', error.message);
+    res.status(500).send('Error accessing the database: ', error.message);
+  }
+
+  if (user_number != number) {
+    return res.status(403).send('Not authorized! ' + user_number + '!=' + number);
+  }
+
+  // Use id to get user_number to compare with number
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+    const [rows, fields] = await connection.execute('SELECT user_number FROM post WHERE id = ?;', [req.params.id]);
+    await connection.end();
+
+    if (rows.length === 0) {
+      res.status(404).send('Post not found.');
+    } else {
+      user_number = rows[0].user_number;
+    }
+  } catch (error) {
+    console.error('Error accessing the database: ', error.message);
+    res.status(500).send('Error accessing the database: ', error.message);
+  }
+
+  if (user_number != number) {
+    return res.status(403).send('Not authorized! ' + user_number + '!=' + number);
+  }
+
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+    const [rows, fields] = await connection.execute('UPDATE post SET message = ? WHERE id = ?;', [message, req.params.id]);
+    await connection.end();
+    res.json({ success: true, message: 'Post changed successfully.' });
+  } catch (error) {
+    console.error('Error accessing the database: ', error.message);
+    res.status(500).send('Error accessing the database: ', error.message);
+  }
+});
+
+// Endpoint to delete own message, checks if user is logged (get sub to get number & get user_number from post by id '/api/v1.0/post_user/:id' and compare user_number with number)
+app.delete('/auth/v1.0/post/:id', requiresAuth(), async (req, res) => {
+  const sub = req.oidc.user.sub;
+  let user_number;
+
+  // Use sub for to get number to compare with user_number
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+    const [rows, fields] = await connection.execute('SELECT number FROM user WHERE sub = ?;', [sub]);
+    await connection.end();
+
+    if (rows.length === 0) {
+      res.status(404).send('User not found.');
+    } else {
+      number = rows[0].number;
+    }
+  } catch (error) {
+    console.error('Error accessing the database: ', error.message);
+    res.status(500).send('Error accessing the database: ', error.message);
+  }
+
+  // Use id to get user_number to compare with number
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+    const [rows, fields] = await connection.execute('SELECT user_number FROM post WHERE id = ?;', [req.params.id]);
+    await connection.end();
+
+    if (rows.length === 0) {
+      res.status(404).send('Post not found.');
+    } else {
+      user_number = rows[0].user_number;
+    }
+  } catch (error) {
+    console.error('Error accessing the database: ', error.message);
+    res.status(500).send('Error accessing the database: ', error.message);
+  }
+
+  if (user_number != number) {
+    return res.status(403).send('Not authorized! ' + user_number + '!=' + number);
+  }
+
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+    const [rows, fields] = await connection.execute('DELETE FROM post WHERE id = ?;', [req.params.id]);
+    await connection.end();
+    res.json({ success: true, message: 'Post deleted successfully.' });
+  } catch (error) {
+    console.error('Error accessing the database: ', error.message);
+    res.status(500).send('Error accessing the database: ', error.message);
+  }
+});
+
 
 // Endpoint to get all user data from auth0 
 app.get('/auth/v1.0/user', requiresAuth(), (req, res) => {

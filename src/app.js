@@ -172,24 +172,42 @@ app.get('/api/v1.0/user_sub/:sub', async (req, res) => {
 });
 
 // Endpoint for retrieving all posts from a user based on user number
-app.get('/api/v1.0/user_posts/:number', async (req, res) => {
-  let { number } = req.params;
+app.get('/api/v1.0/user_posts/:user_number', async (req, res) => {
+  let { user_number } = req.params;
 
   // To prevent sql injection, xss and other attacks here use sanitize-html package
-  number = sanitizeHtml(number, {
+  user_number = sanitizeHtml(user_number, {
     allowedTags: [],
     allowedAttributes: {}
   });
 
   try {
     const connection = await mysql.createConnection(dbConfig);
-    const [rows, fields] = await connection.execute('SELECT * FROM post WHERE user_number = ?;', [number]);
+    const [rows, fields] = await connection.execute('SELECT * FROM post WHERE user_number = ?;', [user_number]);
     await connection.end();
 
     if (rows.length === 0) {
       res.status(404).send('No posts found.');
     } else {
       res.json(rows);
+    }
+  } catch (error) {
+    console.error('Error accessing the database: ', error.message);
+    res.status(500).send('Error accessing the database: ', error.message);
+  }
+});
+
+// Endpoint to get user_number from post by id
+app.get('/api/v1.0/post_user/:id', async (req, res) => {
+  try {
+    const connection = await mysql.createConnection(dbConfig);
+    const [rows, fields] = await connection.execute('SELECT user_number FROM post WHERE id = ?;', [req.params.id]);
+    await connection.end();
+
+    if (rows.length === 0) {
+      res.status(404).send('Post not found.');
+    } else {
+      res.json(rows[0]);
     }
   } catch (error) {
     console.error('Error accessing the database: ', error.message);
