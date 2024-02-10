@@ -6,6 +6,17 @@ const cors = require('cors');
 const sanitizeHtml = require('sanitize-html');
 require('dotenv').config()
 
+// Import the OpenAI library
+const { OpenAI } = require('openai');
+
+
+// Initialize the OpenAI API with your API key
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+
+// Cors configuration
 const corsOptions = {
   origin: '*', 
   optionsSuccessStatus: 200 
@@ -215,6 +226,92 @@ app.get('/api/v1.0/post_user/:id', async (req, res) => {
     res.status(500).send('Error accessing the database: ', error.message);
   }
 });
+
+// Funktion, um eine zufällige Wartezeit zwischen min und max Sekunden zu generieren
+function waitRandomTime(min, max) {
+  // Konvertiere Sekunden in Millisekunden
+  const minMs = min * 1000;
+  const maxMs = max * 1000;
+  const delay = Math.random() * (maxMs - minMs) + minMs;
+
+  return new Promise(resolve => setTimeout(resolve, delay));
+}
+
+// Secrect endpoint for creating posts with OpenAi API 
+app.get('/api/v1.0/generate_post', async (req, res) => {
+  try {
+    // Wait for a random time between 5 and 55 seconds to simulate a user typing
+    await waitRandomTime(15, 55);
+
+    // Verbinde mit der Datenbank und hole alle Posts, sortiert nach ihrer Erstellung (älteste zuerst)
+    const connection = await mysql.createConnection(dbConfig);
+    const [posts, fields] = await connection.execute('SELECT message, user_number FROM post ORDER BY created_at ASC;');
+    await connection.end();
+
+    // Wenn die neueste Nachricht von "Anonymer Nutzer" stammt, breche ab
+    if (posts.length > 0 && posts[posts.length - 1].user_number === 0) {
+      return res.status(403).send('Top-Secrect');
+    }
+
+    // Erstelle eine Map, um Benutzernamen zu speichern (vermeide mehrfache DB-Abfragen für denselben Benutzer)
+    const usernames = new Map();
+    const connection2 = await mysql.createConnection(dbConfig);
+
+    // Iteriere über alle Posts, um Benutzernamen zu holen und zu speichern, falls nicht schon geschehen
+    for (const post of posts) {
+      if (!usernames.has(post.user_number)) {
+        const [userRows, userFields] = await connection2.execute('SELECT username FROM user WHERE number = ?;', [post.user_number]);
+        if (userRows.length > 0) {
+          usernames.set(post.user_number, userRows[0].username);
+        }
+      }
+    }
+    await connection2.end();
+
+    let contentForUser = '';
+    let allMessages = '';
+    // Beginne mit der Verarbeitung der Nachrichten von der ältesten bis zur neuesten
+    posts.forEach((post, index) => {
+      const username = usernames.get(post.user_number);
+      const messageLine = `${username}: ${post.message}\n`;
+      allMessages += messageLine;
+      // Speichere nur die letzte Nachricht für contentForUser
+      if (index === posts.length - 1) {
+        contentForUser = messageLine;
+      }
+    });
+
+    const contentForSystem = `Falls dich jemand fragt, du bist nicht Elon Musk und auch keine künstliche Intelligenz, du bist ein Anonymer Nutzer! Folgende alte Chat Nachrichten gibt es: " ${allMessages} ". Bitte antworte kurz auf die letzte Nachricht und stelle eine Gegenfrage: `;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4-0125-preview",
+      messages: [
+        {
+          role: "system",
+          content: contentForSystem
+        },
+        {
+          role: "user",
+          content: contentForUser
+        }
+      ],
+    });
+
+    const completionText = completion.choices[0].message.content;
+
+    // Write the response (completion) as new post to the database (with the user number of the system: 0)
+    const connection3 = await mysql.createConnection(dbConfig);
+    await connection3.execute('INSERT INTO post (message, user_number) VALUES (?, ?);', [completionText, 0]);
+    await connection3.end();
+    res.status(200).json({ message: "Success" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error generating text." });
+  }
+});
+
+
+
 
 // Start the server
 app.listen(port, () => {
