@@ -28,18 +28,17 @@ function checkForDevArg() {
 // Decide which database configuration to use based on the argument
 // If the '-dev' argument is present, 'localhost' will be used as the host
 // Otherwise, the production database configuration will be used.
-// .env file is used to store the database configuration
 const dbConfig = checkForDevArg() ? {
-  host: process.env.DB_HOST_DEV,
-  user: process.env.DB_USER_DEV,
-  port: process.env.DB_PORT_DEV,
-  database: process.env.DB_NAME_DEV
+  host: process.env.DB_HOST_API_DEV,
+  user: process.env.DB_USER_API_DEV,
+  port: process.env.DB_PORT_API_DEV,
+  database: process.env.DB_NAME_API_DEV
 } : {
-  host: process.env.DB_HOST_PROD,
-  user: process.env.DB_USER_PROD,
-  port: process.env.DB_PORT_PROD,
-  password: process.env.DB_PASSWORD_PROD,
-  database: process.env.DB_NAME_PROD
+  host: process.env.DB_HOST_API_PROD,
+  user: process.env.DB_USER_API_PROD,
+  port: process.env.DB_PORT_API_PROD,
+  password: process.env.DB_PASSWORD_API_PROD,
+  database: process.env.DB_NAME_API_PROD
 };
 
 // Endpoint for retrieving all posts

@@ -9,29 +9,28 @@ const sanitizeHtml = require('sanitize-html');
 // Decide which database configuration to use based on the argument
 // If the '-dev' argument is present, 'localhost' will be used as the host
 // Otherwise, the production database configuration will be used.
-// .env file is used to store the database configuration and auth0 configuration
 const dbConfig = checkForDevArg() ? {
-  host: process.env.DB_HOST_DEV,
-  user: process.env.DB_USER_DEV,
-  port: process.env.DB_PORT_DEV,
-  database: process.env.DB_NAME_DEV
+  host: process.env.DB_HOST_AUTH_DEV,
+  user: process.env.DB_USER_AUTH_DEV,
+  port: process.env.DB_PORT_AUTH_DEV,
+  database: process.env.DB_NAME_AUTH_DEV
 } : {
-  host: process.env.DB_HOST_PROD,
-  user: process.env.DB_USER_PROD,
-  port: process.env.DB_PORT_PROD,
-  password: process.env.DB_PASSWORD_PROD,
-  database: process.env.DB_NAME_PROD
+  host: process.env.DB_HOST_AUTH_PROD,
+  user: process.env.DB_USER_AUTH_PROD,
+  port: process.env.DB_PORT_AUTH_PROD,
+  password: process.env.DB_PASSWORD_AUTH_PROD,
+  database: process.env.DB_NAME_AUTH_PROD
 };
 
 // Auth0 configuration
 const config = {
-  authRequired: false,
-  auth0Logout: true,
-  secret: process.env.SECRET,
-  baseURL: process.env.BASE_URL,
-  clientID: process.env.CLIENT_ID,
-  issuerBaseURL: process.env.ISSUER_BASE_URL
-};
+    authRequired: false,
+    auth0Logout: true,
+    secret: process.env.SECRET,   // Secrect import from .env file
+    baseURL: 'https://zwitschern.chat/auth/v1.0',
+    clientID: '6dHWgZ691XG9pTlUar21zBrdVEvctyFP',
+    issuerBaseURL: 'https://dev-x6a4ln1r3kk4uz5p.us.auth0.com'
+  };
 app.use(auth(config));
 
 // Running the server on port 5000
