@@ -237,14 +237,10 @@ app.post('/auth/v1.0/bio', requiresAuth(), async (req, res) => {
 // Endpoint to change own message, checks if user is logged (get sub to get number & get user_number from post by id '/api/v1.0/post_user/:id' and compare user_number with number)
 app.put('/auth/v1.0/post/:id', requiresAuth(), async (req, res) => {
   const sub = req.oidc.user.sub;
-  let { message, user_number } = req.body; // Get data from the request body
+  let { message} = req.body; // Get data from the request body
 
   // Prevent sql injection, xss and other attacks here use sanitize-html package  
   message = sanitizeHtml(message, {
-    allowedTags: [],
-    allowedAttributes: {}
-  });
-  user_number = sanitizeHtml(user_number, {
     allowedTags: [],
     allowedAttributes: {}
   });
@@ -263,10 +259,6 @@ app.put('/auth/v1.0/post/:id', requiresAuth(), async (req, res) => {
   } catch (error) {
     console.error('Error accessing the database: ', error.message);
     res.status(500).send('Error accessing the database: ', error.message);
-  }
-
-  if (user_number != number) {
-    return res.status(403).send('Not authorized! ' + user_number + '!=' + number);
   }
 
   // Use id to get user_number to compare with number
