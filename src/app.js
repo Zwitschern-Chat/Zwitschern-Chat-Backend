@@ -249,7 +249,7 @@ app.get('/api/v1.0/generate_post', async (req, res) => {
 
     // If the latest message is from "Anonymer Nutzer", abort
     if (posts.length > 0 && posts[posts.length - 1].user_number === 0) {
-      return res.status(403).send('Top-Secrect');
+      return res.status(403).send('Top-Secrect!');
     }
 
     // Create a map to store usernames for user numbers
@@ -303,7 +303,7 @@ app.get('/api/v1.0/generate_post', async (req, res) => {
     const connection3 = await mysql.createConnection(dbConfig);
     await connection3.execute('INSERT INTO post (message, user_number) VALUES (?, ?);', [completionText, 0]);
     await connection3.end();
-    res.status(200).json({ message: "Success" });
+    res.status(200).json({ message: "Top-Secrect" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error generating text." });
