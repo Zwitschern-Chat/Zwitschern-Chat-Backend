@@ -24,13 +24,13 @@ const dbConfig = checkForDevArg() ? {
 
 // Auth0 configuration
 const config = {
-    authRequired: false,
-    auth0Logout: true,
-    secret: process.env.SECRET,   // Secrect import from .env file
-    baseURL: 'https://zwitschern.chat/auth/v1.0',
-    clientID: '6dHWgZ691XG9pTlUar21zBrdVEvctyFP',
-    issuerBaseURL: 'https://dev-x6a4ln1r3kk4uz5p.us.auth0.com'
-  };
+  authRequired: false,
+  auth0Logout: true,
+  secret: process.env.SECRET,
+  baseURL: process.env.BASE_URL,
+  clientID: process.env.CLIENT_ID,
+  issuerBaseURL: process.env.ISSUER_BASE_URL
+};
 app.use(auth(config));
 
 // Running the server on port 5000
