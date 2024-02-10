@@ -10,27 +10,27 @@ const sanitizeHtml = require('sanitize-html');
 // If the '-dev' argument is present, 'localhost' will be used as the host
 // Otherwise, the production database configuration will be used.
 const dbConfig = checkForDevArg() ? {
-  host: 'localhost',
-  user: 'root',
-  port: '3306',
-  database: 'zwitschern'
+  host: process.env.DB_HOST_DEV,
+  user: process.env.DB_USER_DEV,
+  port: process.env.DB_PORT_DEV,
+  database: process.env.DB_NAME_DEV
 } : {
-  host: '45.81.234.35',
-  user: 'auth',
-  port: '3306',
-  password: 'qN.SO-f.xK1D*uNT',
-  database: 'zwitschern'
+  host: process.env.DB_HOST_PROD,
+  user: process.env.DB_USER_PROD,
+  port: process.env.DB_PORT_PROD,
+  password: process.env.DB_PASSWORD_PROD,
+  database: process.env.DB_NAME_PROD
 };
 
 // Auth0 configuration
 const config = {
-    authRequired: false,
-    auth0Logout: true,
-    secret: process.env.SECRET,   // Secrect import from .env file
-    baseURL: 'https://zwitschern.chat/auth/v1.0',
-    clientID: '6dHWgZ691XG9pTlUar21zBrdVEvctyFP',
-    issuerBaseURL: 'https://dev-x6a4ln1r3kk4uz5p.us.auth0.com'
-  };
+  authRequired: false,
+  auth0Logout: true,
+  secret: process.env.SECRET,
+  baseURL: process.env.BASE_URL,
+  clientID: process.env.CLIENT_ID,
+  issuerBaseURL: process.env.ISSUER_BASE_URL
+};
 app.use(auth(config));
 
 // Running the server on port 5000
