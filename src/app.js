@@ -227,9 +227,9 @@ app.get('/api/v1.0/post_user/:id', async (req, res) => {
   }
 });
 
-// Funktion, um eine zufällige Wartezeit zwischen min und max Sekunden zu generieren
+
+// Helper function to wait for a random time between min and max seconds
 function waitRandomTime(min, max) {
-  // Konvertiere Sekunden in Millisekunden
   const minMs = min * 1000;
   const maxMs = max * 1000;
   const delay = Math.random() * (maxMs - minMs) + minMs;
@@ -243,21 +243,20 @@ app.get('/api/v1.0/generate_post', async (req, res) => {
     // Wait for a random time between 5 and 55 seconds to simulate a user typing
     await waitRandomTime(15, 55);
 
-    // Verbinde mit der Datenbank und hole alle Posts, sortiert nach ihrer Erstellung (älteste zuerst)
     const connection = await mysql.createConnection(dbConfig);
     const [posts, fields] = await connection.execute('SELECT message, user_number FROM post ORDER BY created_at ASC;');
     await connection.end();
 
-    // Wenn die neueste Nachricht von "Anonymer Nutzer" stammt, breche ab
+    // If the latest message is from "Anonymer Nutzer", abort
     if (posts.length > 0 && posts[posts.length - 1].user_number === 0) {
       return res.status(403).send('Top-Secrect');
     }
 
-    // Erstelle eine Map, um Benutzernamen zu speichern (vermeide mehrfache DB-Abfragen für denselben Benutzer)
+    // Create a map to store usernames for user numbers
     const usernames = new Map();
     const connection2 = await mysql.createConnection(dbConfig);
 
-    // Iteriere über alle Posts, um Benutzernamen zu holen und zu speichern, falls nicht schon geschehen
+    // Iterate through the posts and get the usernames for the user numbers
     for (const post of posts) {
       if (!usernames.has(post.user_number)) {
         const [userRows, userFields] = await connection2.execute('SELECT username FROM user WHERE number = ?;', [post.user_number]);
@@ -270,17 +269,18 @@ app.get('/api/v1.0/generate_post', async (req, res) => {
 
     let contentForUser = '';
     let allMessages = '';
-    // Beginne mit der Verarbeitung der Nachrichten von der ältesten bis zur neuesten
+    // Begin the message with the username and message of each post
     posts.forEach((post, index) => {
       const username = usernames.get(post.user_number);
       const messageLine = `${username}: ${post.message}\n`;
       allMessages += messageLine;
-      // Speichere nur die letzte Nachricht für contentForUser
+      // Save the last message as the content for the user
       if (index === posts.length - 1) {
-        contentForUser = messageLine;
+        contentForUser = messageLine; // The last message is the content for the user
       }
     });
 
+    // Prepare the content for the system
     const contentForSystem = `Falls dich jemand fragt, du bist nicht Elon Musk und auch keine künstliche Intelligenz, du bist ein Anonymer Nutzer! Folgende alte Chat Nachrichten gibt es: " ${allMessages} ". Bitte antworte kurz auf die letzte Nachricht und stelle eine Gegenfrage: `;
 
     const completion = await openai.chat.completions.create({
@@ -309,8 +309,6 @@ app.get('/api/v1.0/generate_post', async (req, res) => {
     res.status(500).json({ error: "Error generating text." });
   }
 });
-
-
 
 
 // Start the server
