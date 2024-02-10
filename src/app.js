@@ -4,6 +4,7 @@ const mysql = require('mysql2/promise');
 const app = express();
 const cors = require('cors');
 const sanitizeHtml = require('sanitize-html');
+require('dotenv').config()
 
 const corsOptions = {
   origin: '*', 
